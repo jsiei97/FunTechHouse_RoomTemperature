@@ -14,8 +14,8 @@ Built on Ubuntu with:
 * http://arduino.googlecode.com/files/arduino-1.0-linux.tgz
 
 Tested on
-* [http://arduino.cc/en/Main/ArduinoBoardUno | Arduino Uno]
-* [http://arduino.cc/en/Main/ArduinoEthernetShield | Arduino Ethernet Shield]
+* [http://arduino.cc/en/Main/ArduinoBoardUno Arduino Uno]
+* [http://arduino.cc/en/Main/ArduinoEthernetShield Arduino Ethernet Shield]
 
 === Arduino Client for MQTT ===
 * http://knolleary.net/arduino-client-for-mqtt/
