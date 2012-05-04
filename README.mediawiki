@@ -7,6 +7,19 @@ and sends its results using MQTT to a Mosquitto server.
 The sensor is a LM35DZ (10mV/C).
 
 
+=== Hardware Connections ===
+
+ LM35 - Arduino
+ ---------------
+ +Vs  - 5V
+ Vout - A2   (Could be any from A0..A5)
+ GND  - GND
+
+ Arduino - Arduino 
+ -----------------
+ ARef    - 3.3V
+
+
 === Arduino ===
 * http://www.arduino.cc/ 
 
