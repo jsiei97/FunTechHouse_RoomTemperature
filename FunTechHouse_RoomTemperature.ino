@@ -4,8 +4,8 @@
 #include "PubSubClient.h"
 
 // Update these with values suitable for your network.
-byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte ip[]     = { 192, 168, 0, 30 };
+byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0x01 };
+byte ip[]     = { 192, 168, 0, 31 };
 byte server[] = { 192, 168, 0, 64 };
 
 
@@ -21,9 +21,9 @@ void setup()
     analogReference(EXTERNAL); //3.3V
 
     Ethernet.begin(mac, ip);
-    if (client.connect("arduinoClient")) 
+    if (client.connect("FunTechHouse_RoomTemperature")) 
     {
-        client.publish("test/nisse","hello world");
+        client.publish("FunTechHouse/Room1/temperature","#hello world");
         //client.subscribe("inTopic");
     }
 }
@@ -38,7 +38,7 @@ void loop()
 
     if(client.loop() == false)
     {
-        client.connect("arduinoClient");
+        client.connect("FunTechHouse_RoomTemperature");
         //miss_cnt++;
     }
 
@@ -46,14 +46,13 @@ void loop()
     int temp_hel = (int)(temperature);
     int temp_del = (int)((temperature-temp_hel)*10);
 
-    snprintf(str, 30, "temperature=%d.%d (%04d)", temp_hel, temp_del, reading);
+    snprintf(str, 30, "temperature=%d.%d ; raw=%04d", temp_hel, temp_del, reading);
 
     if(client.connected())
     {
-        client.publish("test/nisse", str);
+        client.publish("FunTechHouse/Room1/temperature", str);
     }
 
     delay(10000); 
 }
-
 
