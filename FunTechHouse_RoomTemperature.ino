@@ -13,14 +13,14 @@ char topic_out[] = "FunTechHouse/Room1/Temperature";     ///< data to the server
 
 PubSubClient client(server, 1883, callback);
 
-volatile bool larm_over_active  = true;
-volatile bool larm_under_active = true;
+volatile bool alarm_high_active = true;
+volatile bool alarm_low_active  = true;
 
-volatile double larm_over  = 25;
-volatile double larm_under = 23;
+volatile double alarm_high = 25;
+volatile double alarm_low  = 23;
 
-volatile bool larm_over_sent  = false;
-volatile bool larm_under_sent = false;
+volatile bool alarm_high_sent = false;
+volatile bool alarm_low_sent  = false;
 
 
 
@@ -68,35 +68,35 @@ void loop()
     int temp_hel = (int)(temperature);
     int temp_del = (int)((temperature-temp_hel)*10);
 
-    if( temperature < larm_under ) 
+    if( temperature < alarm_low ) 
     {
-        if(larm_under_active && !larm_under_sent) 
+        if(alarm_low_active && !alarm_low_sent) 
         {
-            larm_under_sent = true;
-            char larm_str[40];
-            snprintf(larm_str, 40, "larm below temperature=%d.%d level=%d", temp_hel, temp_del, (int)larm_under);
-            client.publish(topic_out, larm_str);
+            alarm_low_sent = true;
+            char alarm_str[40];
+            snprintf(alarm_str, 40, "Alarm: Low temperature=%d.%d level=%d", temp_hel, temp_del, (int)alarm_low);
+            client.publish(topic_out, alarm_str);
         }
     }
     else 
     {
-        larm_under_sent = false;
+        alarm_low_sent = false;
     }
 
 
-    if( temperature > larm_over ) 
+    if( temperature > alarm_high ) 
     {
-        if(larm_over_active && !larm_over_sent) 
+        if(alarm_high_active && !alarm_high_sent) 
         {
-            larm_over_sent = true;
-            char larm_str[40];
-            snprintf(larm_str, 40, "larm over temperature=%d.%d level=%d", temp_hel, temp_del, (int)larm_over);
-            client.publish(topic_out, larm_str);
+            alarm_high_sent = true;
+            char alarm_str[40];
+            snprintf(alarm_str, 40, "Alarm: High temperature=%d.%d level=%d", temp_hel, temp_del, (int)alarm_high);
+            client.publish(topic_out, alarm_str);
         }
     }
     else 
     {
-        larm_over_sent = false;
+        alarm_high_sent = false;
     }
 
 
