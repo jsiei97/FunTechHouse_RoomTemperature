@@ -34,10 +34,14 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
 
 void setup()
 {
-    analogReference(EXTERNAL); //3.3V
+    //analogReference(EXTERNAL); //3.3V
+
+    //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
+    analogReference(INTERNAL); //1.1V
 
     sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[0].setSensor(TemperatureSensor::LM35DZ, A2);
+    pinMode(A2, INPUT); //Is this needed?
     sensors[0].setTopic( 
             "FunTechHouse/Room1/TemperatureData", 
             "FunTechHouse/Room1/Temperature"
@@ -69,7 +73,8 @@ void loop()
         if( ((int)TemperatureSensor::LM35DZ) == sensors[i].getSensorType() )
         {
             int reading = analogRead(sensors[i].getSensorPin());
-            temperature = LM35DZ::analog33_to_temperature(reading);
+            //temperature = LM35DZ::analog33_to_temperature(reading);
+            temperature = LM35DZ::analog11_to_temperature(reading);
             readOk = true;
         }
 

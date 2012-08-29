@@ -22,3 +22,19 @@ double LM35DZ::analog33_to_temperature(int reading)
     temperature *= 100;                  // 10mV/C (0.01V/C)
     return temperature;
 }
+
+
+/**
+ * Converts a analogRead value into a temperature (Celsius)
+ * analogReference(INTERNAL); should be used.
+ *
+ * @param reading from analogRead
+ * @return temperature in degrees celsius
+ */
+double LM35DZ::analog11_to_temperature(int reading)
+{
+    double temperature = reading * 1.10; // Internal 1.1V ref
+    temperature /= 1024.0;               // ADC resolution
+    temperature *= 100;                  // 10mV/C (0.01V/C)
+    return temperature;
+}

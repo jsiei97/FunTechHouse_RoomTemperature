@@ -13,6 +13,7 @@ class LM35DZ
      private:
      public:
          static double analog33_to_temperature(int reading);
+         static double analog11_to_temperature(int reading);
 };
 
 #endif  // __LM35DZ_H
