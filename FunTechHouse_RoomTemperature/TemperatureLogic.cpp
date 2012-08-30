@@ -1,3 +1,9 @@
+/**
+ * @file TemperatureLogic.cpp
+ * @author Johan Simonsson  
+ * @brief Helper functions
+ */
+
 #include "TemperatureLogic.h"
 
 /**

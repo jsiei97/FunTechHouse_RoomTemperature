@@ -1,3 +1,9 @@
+/**
+ * @file TemperatureSensor.h
+ * @author Johan Simonsson
+ * @brief A temperature sensor class with alarm logic
+ */
+
 #ifndef  __TEMPERATURESENSOR_H
 #define  __TEMPERATURESENSOR_H
 

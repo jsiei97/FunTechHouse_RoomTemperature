@@ -1,3 +1,9 @@
+/**
+ * @file TemperatureLogic.h
+ * @author Johan Simonsson  
+ * @brief Helper functions
+ */
+
 #ifndef  __TEMPERATURELOGIC_H
 #define  __TEMPERATURELOGIC_H
 

@@ -4,7 +4,6 @@
  * @brief Helper for the LM35DZ sensor
  */
 
-
 #ifndef  __LM35DZ_H
 #define  __LM35DZ_H
 

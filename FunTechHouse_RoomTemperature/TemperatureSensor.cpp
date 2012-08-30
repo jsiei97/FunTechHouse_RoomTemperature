@@ -1,3 +1,9 @@
+/**
+ * @file TemperatureSensor.cpp
+ * @author Johan Simonsson
+ * @brief A temperature sensor class with alarm logic
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +11,10 @@
 #include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 
+/**
+ * Default constructur, 
+ * please note that all alarm are disabled.
+ */
 TemperatureSensor::TemperatureSensor()
 {
     // No sensor
@@ -32,6 +42,13 @@ TemperatureSensor::TemperatureSensor()
 }
 
 #define ALWAYS_SEND_CNT 180
+/**
+ * Is it time to send a new value to the server, 
+ * this is triggered either on change or timeout.
+ *
+ * @param value The new temperature
+ * @return true if it is time to send
+ */
 bool TemperatureSensor::valueTimeToSend(double value)
 {
     //Timeout lets send anyway
@@ -68,6 +85,14 @@ bool TemperatureSensor::valueTimeToSend(double value)
     return false;
 }
 
+/**
+ * Activate high and low alarm.
+ *
+ * @param activeHigh true will active the high alarm
+ * @param high the high alarm level
+ * @param activeLow true will active the low alarm
+ * @param low the low alarm level
+ */
 void TemperatureSensor::setAlarmLevels(bool activeHigh, double high, bool activeLow, double low)
 {
     alarmHighActive = activeHigh;
@@ -169,17 +194,15 @@ int TemperatureSensor::getSensorPin()
     return connectedPin;
 }
 
-
-
 bool TemperatureSensor::setTopic(char* topicSubscribe, char* topicPublish)
 {
     int len = strlen(topicSubscribe);
-    topicIn = (char*)malloc(len+1);  
+    topicIn = (char*)malloc(len+1);
     memcpy(topicIn , topicSubscribe, len);
     topicIn[len] = '\0';
 
     len = strlen(topicPublish);
-    topicOut = (char*)malloc(len+1);  
+    topicOut = (char*)malloc(len+1);
     memcpy(topicOut , topicPublish, len);
     topicOut[len] = '\0';
     return true;
@@ -194,4 +217,3 @@ char* TemperatureSensor::getTopicPublish()
 {
     return topicOut;
 }
-
