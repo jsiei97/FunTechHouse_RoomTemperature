@@ -5,6 +5,7 @@
 #include "LM35DZ.h"
 #include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
+#include "ValueAvg.h"
 
 #include "DeviceConfig.h"
 
@@ -13,7 +14,7 @@ PubSubClient client(server, 1883, callback);
 #define SENSOR_CNT 1
 TemperatureSensor sensors[SENSOR_CNT];
 
-void callback(char* topic, uint8_t* payload, unsigned int length) 
+void callback(char* topic, uint8_t* payload, unsigned int length)
 {
     //1. What topic is it? aka to what sensor will the result go?
     //2. Parse the payload and update the correct sensor
@@ -42,13 +43,13 @@ void setup()
     sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[0].setSensor(TemperatureSensor::LM35DZ, A2);
     pinMode(A2, INPUT); //Is this needed?
-    sensors[0].setTopic( 
-            "FunTechHouse/Room1/TemperatureData", 
+    sensors[0].setTopic(
+            "FunTechHouse/Room1/TemperatureData",
             "FunTechHouse/Room1/Temperature"
             );
 
     Ethernet.begin(mac, ip);
-    if (client.connect(project_name)) 
+    if (client.connect(project_name))
     {
         for( int i=0 ; i<SENSOR_CNT; i++ )
         {
@@ -65,6 +66,8 @@ void loop()
         client.connect(project_name);
     }
 
+
+    ValueAvg filter;
     for( int i=0 ; i<SENSOR_CNT; i++ )
     {
         double temperature = 0;
@@ -72,9 +75,16 @@ void loop()
 
         if( ((int)TemperatureSensor::LM35DZ) == sensors[i].getSensorType() )
         {
-            int reading = analogRead(sensors[i].getSensorPin());
-            //temperature = LM35DZ::analog33_to_temperature(reading);
-            temperature = LM35DZ::analog11_to_temperature(reading);
+            //There is some noice so take a avg on some samples
+            //so we don't see the noice as much...
+            filter.init();
+            for( int j=0 ; j<9 ; j++ )
+            {
+                int reading = analogRead(sensors[i].getSensorPin());
+                //temperature = LM35DZ::analog33_to_temperature(reading);
+                filter.addValue( LM35DZ::analog11_to_temperature(reading) );
+            }
+            temperature = filter.getValue();
             readOk = true;
         }
 
@@ -91,7 +101,7 @@ void loop()
             {
                 int intPart = 0;
                 int decPart = 0;
-                TemperatureLogic::splitDouble(temperature, &intPart, &decPart); 
+                TemperatureLogic::splitDouble(temperature, &intPart, &decPart);
                 snprintf(str, 40, "temperature=%d.%d", intPart, decPart);
 
                 if(client.connected())
@@ -118,5 +128,5 @@ void loop()
         }
     }
 
-    delay(1000); 
+    delay(1000);
 }
