@@ -34,6 +34,8 @@ TemperatureSensor::TemperatureSensor()
     alarmLowActive = false;
     alarmLowSent = false;
 
+    alarmHyst = 1.0;
+
     static int objCnt = 0;
     sensorNumber = objCnt++;
 
@@ -97,9 +99,11 @@ void TemperatureSensor::setAlarmLevels(bool activeHigh, double high, bool active
 {
     alarmHighActive = activeHigh;
     alarmHigh = high;
+    alarmHighSent = false;
 
     alarmLowActive = activeLow;
     alarmLow = low;
+    alarmLowSent = false;
 }
 
 bool TemperatureSensor::alarmHighCheck(double value, char* responce, int maxSize)
@@ -124,7 +128,7 @@ bool TemperatureSensor::alarmHighCheck(double value, char* responce, int maxSize
             sendAlarm = true;
         }
     }
-    else
+    else if( value < (alarmHigh-alarmHyst ) )
     {
         alarmHighSent = false;
     }
@@ -153,7 +157,7 @@ bool TemperatureSensor::alarmLowCheck(double value, char* responce, int maxSize)
             sendAlarm = true;
         }
     }
-    else
+    else if( value > (alarmLow+alarmHyst) )
     {
         alarmLowSent = false;
     }

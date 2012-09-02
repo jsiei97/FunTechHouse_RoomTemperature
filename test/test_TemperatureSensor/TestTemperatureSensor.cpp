@@ -109,7 +109,9 @@ void TestTemperatureSensor::test_alarm()
     sensor.alarmHighFailed();
     QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), true);
     QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(24.0, str, 40), false); //Reset alarm, by dropping under the level
+    QCOMPARE(sensor.alarmHighCheck(24.9, str, 40), false); //Check that the hyst is working
+    QCOMPARE(sensor.alarmHighCheck(25.1, str, 40), false);
+    QCOMPARE(sensor.alarmHighCheck(23.0, str, 40), false); //Reset alarm, by dropping under the level
     QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), true); // Then we get a new alarm
 
     //Low is still deactivated
@@ -121,6 +123,8 @@ void TestTemperatureSensor::test_alarm()
     QCOMPARE(sensor.alarmLowCheck(30.0, str, 40), false); //Higher no alarm
     QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), true); //lower -> alarm
     QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), false); //but only once
+    QCOMPARE(sensor.alarmLowCheck(20.1, str, 40), false); //Check that hyst is working
+    QCOMPARE(sensor.alarmLowCheck(19.9, str, 40), false); 
     QCOMPARE(sensor.alarmLowCheck(22.0, str, 40), false); //Reset by going over
     QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), true);  //Then we get a new alarm
     QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), false); //but only once

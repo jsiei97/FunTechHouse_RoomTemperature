@@ -36,6 +36,8 @@ class TemperatureSensor
         bool   alarmLowActive;///< Is low alarm activated.
         bool   alarmLowSent;  ///< Have we sent this alarm? We only send alarm ones
 
+        double alarmHyst; ///< alarm level must go back this much to be reseted
+
         char* topicIn; ///< MQTT topic for data from the server
         char* topicOut;///< MQTT topic for data to the server
 
