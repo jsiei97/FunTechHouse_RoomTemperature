@@ -23,7 +23,7 @@ TemperatureSensor::TemperatureSensor()
 
     //Some default values
     valueSent = 0.0;
-    valueDiffMax = 0.5;
+    valueDiffMax = 0.8;
     valueSendCnt = 0;
 
     alarmHigh = 25.0;

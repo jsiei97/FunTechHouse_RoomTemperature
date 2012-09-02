@@ -69,14 +69,14 @@ void TestTemperatureSensor::test_valueTimeToSend()
     QCOMPARE(sensor.valueTimeToSend(10.0), false);
 
     //Now check with a +diff
-    QCOMPARE(sensor.valueTimeToSend(10.7), true);  //diff > 0.5 => OK
-    QCOMPARE(sensor.valueTimeToSend(11.0), false); //diff < 0.5 => Not ok
-    QCOMPARE(sensor.valueTimeToSend(11.3), true);  //diff 11.3-10.7=0.6 > 0.5 => OK
+    QCOMPARE(sensor.valueTimeToSend(10.9), true);  //diff > 0.8 => OK
+    QCOMPARE(sensor.valueTimeToSend(11.0), false); //diff < 0.8 => Not ok
+    QCOMPARE(sensor.valueTimeToSend(12.3), true);  //diff 12.3-10.9=1.4 > 0.8 => OK
 
     //Now check with a -diff
-    QCOMPARE(sensor.valueTimeToSend(10.3), true);  //diff > 0.5 => OK
-    QCOMPARE(sensor.valueTimeToSend(10.0), false); //diff < 0.5 => Not ok
-    QCOMPARE(sensor.valueTimeToSend( 9.7), true);  //diff 10.3-9.7=0.6 > 0.5 => OK
+    QCOMPARE(sensor.valueTimeToSend(10.3), true);  //diff > 0.8 => OK
+    QCOMPARE(sensor.valueTimeToSend(10.0), false); //diff < 0.8 => Not ok
+    QCOMPARE(sensor.valueTimeToSend( 9.4), true);  //diff 10.3-9.4=0.9 > 0.8 => OK
 }
 
 
