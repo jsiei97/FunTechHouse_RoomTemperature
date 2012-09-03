@@ -45,6 +45,7 @@ class TemperatureSensor
         TemperatureSensor();
 
         bool valueTimeToSend(double value);
+        void setDiffToSend(double value);
 
         void setAlarmLevels(bool activeHigh, double high, bool activeLow, double low);
         bool alarmHighCheck(double value, char* responce, int maxSize);

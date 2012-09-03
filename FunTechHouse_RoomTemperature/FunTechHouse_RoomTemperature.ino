@@ -42,6 +42,7 @@ void setup()
 
     sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[0].setSensor(TemperatureSensor::LM35DZ, A2);
+    sensors[0].setDiffToSend(1.0);
     pinMode(A2, INPUT); //Is this needed?
     sensors[0].setTopic(
             "FunTechHouse/Room1/TemperatureData",
@@ -128,5 +129,5 @@ void loop()
         }
     }
 
-    delay(2000);
+    delay(1000);
 }

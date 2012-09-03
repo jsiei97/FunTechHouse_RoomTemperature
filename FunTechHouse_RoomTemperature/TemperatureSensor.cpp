@@ -106,6 +106,17 @@ void TemperatureSensor::setAlarmLevels(bool activeHigh, double high, bool active
     alarmLowSent = false;
 }
 
+
+/**
+ * How much must the value change before we send it?
+ *
+ * @param value if value is set to X, then we send directly if the messured value diff more than X from the last sent value.
+ */
+void TemperatureSensor::setDiffToSend(double value)
+{
+    valueDiffMax = value;
+}
+
 bool TemperatureSensor::alarmHighCheck(double value, char* responce, int maxSize)
 {
     bool sendAlarm = false;
