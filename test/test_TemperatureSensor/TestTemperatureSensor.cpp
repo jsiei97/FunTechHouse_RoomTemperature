@@ -53,7 +53,7 @@ void TestTemperatureSensor::test_valueTimeToSend()
 
     bool res = sensor.valueTimeToSend(10.0);
     QCOMPARE(res, true); //Always send the first time...
-    for(int i=1; i<=180; i++)
+    for(int i=1; i<=ALWAYS_SEND_CNT; i++)
     {
         res = sensor.valueTimeToSend(10.0);
         if(true == res)
@@ -62,6 +62,8 @@ void TestTemperatureSensor::test_valueTimeToSend()
             QFAIL("Error valueSendCnt wrong");
         }
     }
+
+    sensor.setDiffToSend(0.8);
 
     //Then we shall send
     QCOMPARE(sensor.valueTimeToSend(10.0), true);

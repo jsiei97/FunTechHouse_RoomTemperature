@@ -7,6 +7,11 @@
 #ifndef  __TEMPERATURESENSOR_H
 #define  __TEMPERATURESENSOR_H
 
+// If value is the "same" for "cnt" questions, then send anyway.
+// If sleep is 1s (1000ms) and there is 1 question per rotation
+// then we have 600/1s=600s or always send every 10min
+#define ALWAYS_SEND_CNT 600
+
 class TemperatureSensor
 {
     public:

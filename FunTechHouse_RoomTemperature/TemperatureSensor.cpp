@@ -43,7 +43,6 @@ TemperatureSensor::TemperatureSensor()
     topicOut = NULL;
 }
 
-#define ALWAYS_SEND_CNT 180
 /**
  * Is it time to send a new value to the server, 
  * this is triggered either on change or timeout.
