@@ -11,7 +11,7 @@
 
 PubSubClient client(server, 1883, callback);
 
-#define SENSOR_CNT 1
+#define SENSOR_CNT 2
 TemperatureSensor sensors[SENSOR_CNT];
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
@@ -40,6 +40,7 @@ void setup()
     //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
     analogReference(INTERNAL); //1.1V
 
+    //Config the first sensor
     sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[0].setSensor(TemperatureSensor::LM35DZ, A2);
     sensors[0].setDiffToSend(1.4);
@@ -47,6 +48,16 @@ void setup()
     sensors[0].setTopic(
             "FunTechHouse/Room1/TemperatureData",
             "FunTechHouse/Room1/Temperature"
+            );
+
+    //Then configure a second sensor
+    sensors[1].setAlarmLevels(true, 25.0, true, 22.0);
+    sensors[1].setSensor(TemperatureSensor::LM35DZ, A3);
+    sensors[1].setDiffToSend(1.4);
+    pinMode(A3, INPUT); //Is this needed?
+    sensors[1].setTopic(
+            "FunTechHouse/Room2/TemperatureData",
+            "FunTechHouse/Room2/Temperature"
             );
 
     Ethernet.begin(mac, ip);
