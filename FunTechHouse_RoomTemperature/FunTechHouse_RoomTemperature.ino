@@ -3,6 +3,7 @@
 #include "PubSubClient.h"
 
 #include "LM35DZ.h"
+#include "DS18B20.h"
 #include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 #include "ValueAvg.h"
@@ -11,7 +12,7 @@
 
 PubSubClient client(server, 1883, callback);
 
-#define SENSOR_CNT 2
+#define SENSOR_CNT 3
 TemperatureSensor sensors[SENSOR_CNT];
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
@@ -60,6 +61,15 @@ void setup()
             "FunTechHouse/Room2/Temperature"
             );
 
+    //And a third, that is a DS18B20
+    sensors[2].setAlarmLevels(true, 25.0, true, 22.0);
+    sensors[2].setSensor(TemperatureSensor::DS18B20, 2);
+    sensors[2].setDiffToSend(0.5);
+    sensors[2].setTopic(
+            "FunTechHouse/Room3/TemperatureData",
+            "FunTechHouse/Room3/Temperature"
+            );
+
     Ethernet.begin(mac, ip);
     if (client.connect(project_name))
     {
@@ -98,6 +108,14 @@ void loop()
             }
             temperature = filter.getValue();
             readOk = true;
+        }
+        else if( ((int)TemperatureSensor::DS18B20) == sensors[i].getSensorType() )
+        {
+            temperature = DS18B20::getTemperature(sensors[i].getSensorPin());
+            if(temperature != 0.0)
+            {
+                readOk = true;
+            }
         }
 
         if(true == readOk)
