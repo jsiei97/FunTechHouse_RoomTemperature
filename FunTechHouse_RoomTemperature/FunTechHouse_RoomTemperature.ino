@@ -64,7 +64,7 @@ void setup()
     //And a third, that is a DS18B20
     sensors[2].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[2].setSensor(TemperatureSensor::DS18B20, 2);
-    sensors[2].setDiffToSend(0.5);
+    sensors[2].setDiffToSend(0.2);
     sensors[2].setTopic(
             "FunTechHouse/Room3/TemperatureData",
             "FunTechHouse/Room3/Temperature"
@@ -107,12 +107,23 @@ void loop()
                 filter.addValue( LM35DZ::analog11_to_temperature(reading) );
             }
             temperature = filter.getValue();
-            readOk = true;
+
+            //No sensor connected becomes 109deg,
+            //so lets just ignore values higher than 105
+            if(temperature <= 105.0)
+            {
+                readOk = true;
+            }
         }
         else if( ((int)TemperatureSensor::DS18B20) == sensors[i].getSensorType() )
         {
             temperature = DS18B20::getTemperature(sensors[i].getSensorPin());
-            if(temperature != 0.0)
+            //This functions returns 0.0 when something is wrong,
+            //maybe not the best value... let's change that some day....
+            //
+            //And 85.0 is the DS18B20 default error value,
+            //so ignore that as well...
+            if(temperature != 0.0 && temperature != 85.0)
             {
                 readOk = true;
             }

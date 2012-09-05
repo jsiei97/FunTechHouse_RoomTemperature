@@ -2,12 +2,12 @@
 #define  __DS18B20_H
 
 
-class DS18B20 
+class DS18B20
 {
-     private: 
-     public: 
+     private:
+     public:
          static double getTemperature(int pin);
 
 };
 
-#endif  // __DS18B20_H 
+#endif  // __DS18B20_H

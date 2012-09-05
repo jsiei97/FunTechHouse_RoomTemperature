@@ -1,6 +1,6 @@
 /**
  * @file TemperatureLogic.cpp
- * @author Johan Simonsson  
+ * @author Johan Simonsson
  * @brief Helper functions
  */
 

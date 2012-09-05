@@ -1,6 +1,15 @@
 #include "DS18B20.h"
 #include "OneWire.h"
 
+/**
+ * Returns a temperature from a OneWire sensor.
+ * Please note that there is a need for a 750ms delay in the middle
+ * that is removed so this function starts a new reading
+ * and returns the result from the last reading.
+ *
+ * @param pin the pin the OneWire but is connected to.
+ * @return temperature
+ */
 double DS18B20::getTemperature(int pin)
 {
     OneWire ds(pin);
@@ -58,9 +67,17 @@ double DS18B20::getTemperature(int pin)
 
     ds.reset();
     ds.select(addr);
-    ds.write(0x44,1);         // start conversion, with parasite power on at the end
+    ds.write(0x44,0); // start conversion, with power on
 
-    delay(1000);     // maybe 750ms is enough, maybe not
+    // Please note that every conversion takes 750ms,
+    // and if we don't wait we get the last value...
+    // But since we wait 1000ms in the main loop that delay
+    // will give us the new value the next time.
+    //
+    // More or less wait now or later,
+    // so if we have many DS18B20 then it is enough to wait once in the main loop
+
+    //delay(1000);     // maybe 750ms is enough, maybe not
     // we might do a ds.depower() here, but the reset will take care of it.
 
     present = ds.reset();
@@ -88,7 +105,7 @@ double DS18B20::getTemperature(int pin)
     if( type_s )
     {
         raw = raw << 3; // 9 bit resolution default
-        if( data[7] == 0x10 ) 
+        if( data[7] == 0x10 )
         {
             // count remain gives full 12 bit resolution
             raw = (raw & 0xFFF0) + 12 - data[6];
