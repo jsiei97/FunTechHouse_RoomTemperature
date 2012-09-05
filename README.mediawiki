@@ -4,7 +4,7 @@ A room temperature sensor for the FunTechHouse project.
 This project uses a Arduino with a Ethernet shield, 
 and sends its results using MQTT to a Mosquitto server.
 
-The sensor is a LM35DZ (10mV/C).
+The sensor is a LM35DZ (10mV/C), or DS18B20 (OneWire).
 
 
 === Hardware Connections ===
@@ -15,9 +15,6 @@ The sensor is a LM35DZ (10mV/C).
  Vout - A2   (Could be any from A0..A5)
  GND  - GND
 
- Arduino - Arduino 
- -----------------
- ARef    - 3.3V
 
 
 === Arduino ===
@@ -36,6 +33,10 @@ Tested on
 
 === Mosquitto, An Open Source MQTT v3.1 Broker ===
 * http://mosquitto.org/
+
+=== OneWire lib === 
+* http://www.arduino.cc/playground/Learning/OneWire
+* http://www.pjrc.com/teensy/arduino_libraries/OneWire.zip
 
 === LM35DZ ===
 * http://www.national.com/popr/LM35.html

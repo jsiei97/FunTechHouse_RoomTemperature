@@ -18,7 +18,8 @@ class TemperatureSensor
     public:
         enum SensorTypes {
             NO_SENSOR = 0,
-            LM35DZ
+            LM35DZ,
+            DS18B20 
         };
 
     private:
