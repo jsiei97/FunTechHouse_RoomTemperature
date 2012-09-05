@@ -36,6 +36,7 @@ Tested on
 
 === OneWire lib === 
 * http://www.arduino.cc/playground/Learning/OneWire
+* http://www.pjrc.com/teensy/td_libs_OneWire.html
 * http://www.pjrc.com/teensy/arduino_libraries/OneWire.zip
 
 === LM35DZ ===
