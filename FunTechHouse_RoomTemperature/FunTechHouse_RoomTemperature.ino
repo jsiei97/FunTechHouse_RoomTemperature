@@ -2,18 +2,26 @@
 #include <Ethernet.h>
 #include "PubSubClient.h"
 
-#include "LM35DZ.h"
 #include "DS18B20.h"
-#include "TemperatureSensor.h"
-#include "TemperatureLogic.h"
+#include "LM35DZ.h"
 #include "ValueAvg.h"
 
-#include "DeviceConfig.h"
+#include "TemperatureSensor.h"
+#include "TemperatureLogic.h"
 
-PubSubClient client(server, 1883, callback);
+
+// Update these with values suitable for your network.
+uint8_t mac[]    = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0x01 };
+uint8_t ip[]     = { 192, 168, 0, 31 };
+uint8_t server[] = { 192, 168, 0, 64 };
+
+// The MQTT device name, this must be unique
+char project_name[] = "FunTechHouse_RoomTemperature__Device01";
 
 #define SENSOR_CNT 3
 TemperatureSensor sensors[SENSOR_CNT];
+
+PubSubClient client(server, 1883, callback);
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
 {
@@ -36,8 +44,6 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
 
 void setup()
 {
-    //analogReference(EXTERNAL); //3.3V
-
     //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
     analogReference(INTERNAL); //1.1V
 
@@ -103,7 +109,6 @@ void loop()
             for( int j=0 ; j<9 ; j++ )
             {
                 int reading = analogRead(sensors[i].getSensorPin());
-                //temperature = LM35DZ::analog33_to_temperature(reading);
                 filter.addValue( LM35DZ::analog11_to_temperature(reading) );
             }
             temperature = filter.getValue();
