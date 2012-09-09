@@ -12,8 +12,6 @@
 
 // Update these with values suitable for your network.
 uint8_t mac[]    = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0x01 };
-uint8_t ip[]     = { 192, 168, 0, 31 };
-uint8_t server[] = { 192, 168, 0, 64 };
 
 // The MQTT device name, this must be unique
 char project_name[] = "FunTechHouse_RoomTemperature__Device01";
@@ -21,7 +19,7 @@ char project_name[] = "FunTechHouse_RoomTemperature__Device01";
 #define SENSOR_CNT 3
 TemperatureSensor sensors[SENSOR_CNT];
 
-PubSubClient client(server, 1883, callback);
+PubSubClient client("mosqhub", 1883, callback);
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
 {
@@ -76,7 +74,7 @@ void setup()
             "FunTechHouse/Room3/Temperature"
             );
 
-    Ethernet.begin(mac, ip);
+    Ethernet.begin(mac);
     if (client.connect(project_name))
     {
         for( int i=0 ; i<SENSOR_CNT; i++ )
