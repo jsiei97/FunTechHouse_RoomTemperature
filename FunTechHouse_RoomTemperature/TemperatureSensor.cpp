@@ -12,7 +12,7 @@
 #include "TemperatureLogic.h"
 
 /**
- * Default constructur, 
+ * Default constructur,
  * please note that all alarm are disabled.
  */
 TemperatureSensor::TemperatureSensor()
@@ -44,7 +44,7 @@ TemperatureSensor::TemperatureSensor()
 }
 
 /**
- * Is it time to send a new value to the server, 
+ * Is it time to send a new value to the server,
  * this is triggered either on change or timeout.
  *
  * @param value The new temperature
@@ -192,6 +192,17 @@ void TemperatureSensor::alarmLowFailed()
 }
 
 
+/**
+ * What kind of sensor is this?
+ * And where is it connected?
+ *
+ * Please note that for analog sensors valid pins are A0..A5,
+ * and for OneWire A0..A5, 2..3 and 5..9
+ * (since the ethernet board uses 4,10..13).
+ *
+ * @param type What type it is
+ * @param pin What pin it is connected on
+ */
 void TemperatureSensor::setSensor(SensorTypes type, int pin)
 {
     sensorType = type;
@@ -208,6 +219,13 @@ int TemperatureSensor::getSensorPin()
     return connectedPin;
 }
 
+/**
+ * What mqtt topics this sensor will use.
+ *
+ * @param topicSubscribe data from the mqtt server
+ * @param topicPublish data to the mqtt server
+ * @return true if ok
+ */
 bool TemperatureSensor::setTopic(char* topicSubscribe, char* topicPublish)
 {
     int len = strlen(topicSubscribe);
@@ -219,6 +237,7 @@ bool TemperatureSensor::setTopic(char* topicSubscribe, char* topicPublish)
     topicOut = (char*)malloc(len+1);
     memcpy(topicOut , topicPublish, len);
     topicOut[len] = '\0';
+
     return true;
 }
 
