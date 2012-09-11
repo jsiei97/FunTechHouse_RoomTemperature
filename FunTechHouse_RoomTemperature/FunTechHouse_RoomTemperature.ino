@@ -113,7 +113,7 @@ void loop()
 
             //No sensor connected becomes 109deg,
             //so lets just ignore values higher than 105
-            if(temperature <= 105.0)
+            if(temperature <= 105.0 && temperature != 0.0)
             {
                 readOk = true;
             }

@@ -19,8 +19,13 @@ double LM35DZ::analog33_to_temperature(int reading)
     temperature /= 1024.0;               // ADC resolution
     temperature *= 100;                  // 10mV/C (0.01V/C)
 
-    /// @todo Check if value is bigger or smaller than allowed
-    return temperature;
+    //Datasheet tells us
+    //-"Rated for full −55 ̊ to +150 ̊C range"
+    if( temperature <= 150 && temperature >= -55)
+    {
+        return temperature;
+    }
+    return 0.0;
 }
 
 /**
@@ -36,6 +41,11 @@ double LM35DZ::analog11_to_temperature(int reading)
     temperature /= 1024.0;               // ADC resolution
     temperature *= 100;                  // 10mV/C (0.01V/C)
 
-    /// @todo Check if value is bigger or smaller than allowed
-    return temperature;
+    //Datasheet tells us
+    //-"Rated for full −55 ̊ to +150 ̊C range"
+    if( temperature <= 150 && temperature >= -55)
+    {
+        return temperature;
+    }
+    return 0.0;
 }

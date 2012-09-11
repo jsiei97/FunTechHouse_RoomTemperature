@@ -130,6 +130,15 @@ double DS18B20::getTemperature(int pin)
     }
     celsius = (float)raw / 16.0;
 
-    return celsius;
+    //Datasheet tells us
+    //-"Measures temperatures from -55°C to +125°C"
+    //so if it not in that range... something is wrong!
+    if(celsius <= 125 && celsius >= -55)
+    {
+        return celsius;
+    }
+
+    //The calc above did not go well :(
+    return 0.0;
 }
 
