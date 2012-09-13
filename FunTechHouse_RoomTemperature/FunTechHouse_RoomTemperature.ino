@@ -1,20 +1,17 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include "PubSubClient.h"
-
 #include "DS18B20.h"
 #include "LM35DZ.h"
 #include "ValueAvg.h"
-
 #include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 
-
 // Update these with values suitable for your network.
-uint8_t mac[]    = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0x01 };
+uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
 
 // The MQTT device name, this must be unique
-char project_name[] = "FunTechHouse_RoomTemperature__Device01";
+char project_name[] = "FunTechHouse_RoomTemperature";
 
 #define SENSOR_CNT 3
 TemperatureSensor sensors[SENSOR_CNT];
@@ -87,6 +84,7 @@ void setup()
 
 void loop()
 {
+    //Talk with the server so he dont forget us.
     if(client.loop() == false)
     {
         client.connect(project_name);
