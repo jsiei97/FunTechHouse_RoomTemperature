@@ -4,7 +4,9 @@ Room temperature sensor for the FunTechHouse project.
 This project uses a Arduino with a Ethernet shield, 
 and sends its results using MQTT to a Mosquitto server.
 
-The sensor is a LM35DZ (10mV/C), or DS18B20 (OneWire).
+Supported sensors:
+* LM35DZ (10mV/C)
+* DS18B20 (OneWire)
 
 Fore more info: 
 * http://fun-tech.se/FunTechHouse/RoomTemperature/index.php
