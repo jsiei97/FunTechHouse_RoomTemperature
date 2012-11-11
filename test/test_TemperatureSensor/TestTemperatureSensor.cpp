@@ -16,6 +16,8 @@ class TestTemperatureSensor : public QObject
 
         void test_valueTimeToSend();
         void test_alarm();
+        void test_offset();
+        void test_offset_data();
         void test_setSensor();
         void test_setTopic();
 };
@@ -94,64 +96,126 @@ void TestTemperatureSensor::test_alarm()
     sensor.setAlarmLevels(false, 25.0, false, 20.0);
 
     char str[40];
-    QCOMPARE(sensor.alarmHighCheck(15.0, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(22.0, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(35.0, str, 40), false);
 
-    QCOMPARE(sensor.alarmLowCheck(15.0, str, 40), false);
-    QCOMPARE(sensor.alarmLowCheck(22.0, str, 40), false);
-    QCOMPARE(sensor.alarmLowCheck(25.0, str, 40), false);
+    sensor.valueTimeToSend(15.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    sensor.valueTimeToSend(22.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    sensor.valueTimeToSend(35.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+
+    sensor.valueTimeToSend(15.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
+    sensor.valueTimeToSend(22.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
+    sensor.valueTimeToSend(25.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
 
 
     //High alarm active, but not low alarm.
     sensor.setAlarmLevels(true, 25.0, false, 25.0);
-    QCOMPARE(sensor.alarmHighCheck(15.0, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), true);
-    QCOMPARE(sensor.alarmHighCheck(27.0, str, 40), false); //Only 1 alarm!
+
+    sensor.valueTimeToSend(15.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    sensor.valueTimeToSend(26.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), true);
+    sensor.valueTimeToSend(27.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false); //Only 1 alarm!
     sensor.alarmHighFailed();
-    QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), true);
-    QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(24.9, str, 40), false); //Check that the hyst is working
-    QCOMPARE(sensor.alarmHighCheck(25.1, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(23.0, str, 40), false); //Reset alarm, by dropping under the level
-    QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), true); // Then we get a new alarm
+    sensor.valueTimeToSend(26.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), true);
+    sensor.valueTimeToSend(26.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    sensor.valueTimeToSend(24.9);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false); //Check that the hyst is working
+    sensor.valueTimeToSend(25.1);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    sensor.valueTimeToSend(23.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false); //Reset alarm, by dropping under the level
+    sensor.valueTimeToSend(26.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), true); // Then we get a new alarm
 
     //Low is still deactivated
-    QCOMPARE(sensor.alarmLowCheck(20.0, str, 40), false);
-    QCOMPARE(sensor.alarmLowCheck(30.0, str, 40), false);
+    sensor.valueTimeToSend(20.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
+    sensor.valueTimeToSend(30.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
 
     //Low alarm active, but no high alarm
     sensor.setAlarmLevels(false, 25.0, true, 20.0);
-    QCOMPARE(sensor.alarmLowCheck(30.0, str, 40), false); //Higher no alarm
-    QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), true); //lower -> alarm
-    QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), false); //but only once
-    QCOMPARE(sensor.alarmLowCheck(20.1, str, 40), false); //Check that hyst is working
-    QCOMPARE(sensor.alarmLowCheck(19.9, str, 40), false); 
-    QCOMPARE(sensor.alarmLowCheck(22.0, str, 40), false); //Reset by going over
-    QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), true);  //Then we get a new alarm
-    QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), false); //but only once
+
+    sensor.valueTimeToSend(30.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); //Higher no alarm
+    sensor.valueTimeToSend(18.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), true); //lower -> alarm
+    sensor.valueTimeToSend(18.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); //but only once
+    sensor.valueTimeToSend(20.1);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); //Check that hyst is working
+    sensor.valueTimeToSend(19.9);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); 
+    sensor.valueTimeToSend(22.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); //Reset by going over
+    sensor.valueTimeToSend(18.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), true);  //Then we get a new alarm
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); //but only once
 
     sensor.alarmLowFailed(); //Send failed so we can mark that the alarm was not sent
-    QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), true); // Then we get a new alarm
-    QCOMPARE(sensor.alarmLowCheck(18.0, str, 40), false); //but only once
+    sensor.valueTimeToSend(18.0);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), true); // Then we get a new alarm
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false); //but only once
 
     //High is deactivated
-    QCOMPARE(sensor.alarmHighCheck(24.0, str, 40), false);
-    QCOMPARE(sensor.alarmHighCheck(26.0, str, 40), false);
+    sensor.valueTimeToSend(24.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    sensor.valueTimeToSend(26.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
 
     // Both alarms active
     sensor.setAlarmLevels(true, 22.0, true, 20.0);
 
-    QCOMPARE(sensor.alarmHighCheck(21.0, str, 40), false);
-    QCOMPARE(sensor.alarmLowCheck(21.0, str, 40), false);
+    sensor.valueTimeToSend(21.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
 
-    QCOMPARE(sensor.alarmHighCheck(23.0, str, 40), true);
-    QCOMPARE(sensor.alarmLowCheck(23.0, str, 40), false);
+    sensor.valueTimeToSend(23.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), true);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), false);
 
-    QCOMPARE(sensor.alarmHighCheck(19.0, str, 40), false);
-    QCOMPARE(sensor.alarmLowCheck(19.0, str, 40), true);
+    sensor.valueTimeToSend(19.0);
+    QCOMPARE(sensor.alarmHighCheck(str, 40), false);
+    QCOMPARE(sensor.alarmLowCheck(str, 40), true);
 }
 
+
+void TestTemperatureSensor::test_offset_data()
+{
+    QTest::addColumn<double>("value");
+    QTest::addColumn<double>("offset");
+    QTest::addColumn<double>("result");
+
+    QTest::newRow("No offset")   << 15.0 <<  0.0 << 15.0;
+    QTest::newRow("Offset +1")   << 10.0 <<  1.0 << 11.0;
+    QTest::newRow("Offset -1")   << 10.0 << -1.0 <<  9.0;
+    QTest::newRow("Offset +9.5") << 10.0 <<  9.5 << 19.5;
+    QTest::newRow("Offset -9.5") << 10.0 << -9.5 <<  0.5;
+}
+/**
+ * Check that the offset is correct
+ */
+void TestTemperatureSensor::test_offset()
+{
+    QFETCH(double, value);
+    QFETCH(double, offset);
+    QFETCH(double, result);
+
+    TemperatureSensor sensor;
+
+    sensor.setValueOffset(offset);
+    sensor.valueTimeToSend(value);
+    
+    QCOMPARE(sensor.valueWork, result);
+}
 
 /**
  * Test the set sensor type and what pin is used

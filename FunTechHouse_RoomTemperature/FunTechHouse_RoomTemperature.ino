@@ -139,6 +139,7 @@ void loop()
 
             char str[40];
 
+            //Check and save the current value
             if( sensors[i].valueTimeToSend(temperature) )
             {
                 int intPart = 0;
@@ -152,7 +153,7 @@ void loop()
                 }
             }
 
-            if(sensors[i].alarmHighCheck(temperature, str, 40))
+            if(sensors[i].alarmHighCheck(str, 40))
             {
                 if( (false == client.connected()) || (false == client.publish(sensors[i].getTopicPublish(), str)) )
                 {
@@ -160,7 +161,7 @@ void loop()
                 }
             }
 
-            if(sensors[i].alarmLowCheck(temperature, str, 40))
+            if(sensors[i].alarmLowCheck(str, 40))
             {
                 if( (false == client.connected()) || (false == client.publish(sensors[i].getTopicPublish(), str)) )
                 {

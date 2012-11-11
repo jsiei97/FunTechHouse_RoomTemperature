@@ -29,9 +29,11 @@ class TemperatureSensor
         int sensorNumber;      ///< What object/sensor is this?
 
         //Variables for the value
+        double valueWork;   ///< Active value that we work with right now
         double valueSent;   ///< Last value sent to the server
         double valueDiffMax;///< Value should diff more than this to be sent to the server
         int    valueSendCnt;///< Always send after "cnt time" even if there is no change
+        double valueOffset; ///< Offset calibration value, this will just be added to the messured value
 
         //Varibles for alarm high
         double alarmHigh;      ///< Values higher than this will trigger an alarm
@@ -53,10 +55,11 @@ class TemperatureSensor
 
         bool valueTimeToSend(double value);
         void setDiffToSend(double value);
+        void setValueOffset(double value);
 
         void setAlarmLevels(bool activeHigh, double high, bool activeLow, double low);
-        bool alarmHighCheck(double value, char* responce, int maxSize);
-        bool alarmLowCheck (double value, char* responce, int maxSize);
+        bool alarmHighCheck(char* responce, int maxSize);
+        bool alarmLowCheck (char* responce, int maxSize);
         void alarmHighFailed();
         void alarmLowFailed();
 

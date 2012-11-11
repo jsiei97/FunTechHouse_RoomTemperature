@@ -22,9 +22,11 @@ TemperatureSensor::TemperatureSensor()
     connectedPin = 0;
 
     //Some default values
+    valueWork = 0.0;
     valueSent = 0.0;
     valueDiffMax = 0.8;
     valueSendCnt = 0;
+    valueOffset = 0;
 
     alarmHigh = 25.0;
     alarmHighActive = false;
@@ -52,6 +54,8 @@ TemperatureSensor::TemperatureSensor()
  */
 bool TemperatureSensor::valueTimeToSend(double value)
 {
+    valueWork = value+valueOffset;
+
     //Timeout lets send anyway
     if(0 == valueSendCnt)
     {
@@ -116,10 +120,21 @@ void TemperatureSensor::setDiffToSend(double value)
     valueDiffMax = value;
 }
 
-bool TemperatureSensor::alarmHighCheck(double value, char* responce, int maxSize)
+/**
+ * If a sensor has a static measurment error, 
+ * this offset value can be added to correct such a error.
+ *
+ * @param value the offset value that will be added
+ */
+void TemperatureSensor::setValueOffset(double value)
+{
+    valueOffset = value;
+}
+
+bool TemperatureSensor::alarmHighCheck(char* responce, int maxSize)
 {
     bool sendAlarm = false;
-    if(value > alarmHigh)
+    if(valueWork > alarmHigh)
     {
         if(alarmHighActive && !alarmHighSent)
         {
@@ -127,7 +142,7 @@ bool TemperatureSensor::alarmHighCheck(double value, char* responce, int maxSize
 
             int integerPart = 0;
             int decimalPart = 0;
-            TemperatureLogic::splitDouble(value, &integerPart, &decimalPart);
+            TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
 
             int intAlarm = 0;
             int decAlarm = 0;
@@ -138,17 +153,17 @@ bool TemperatureSensor::alarmHighCheck(double value, char* responce, int maxSize
             sendAlarm = true;
         }
     }
-    else if( value < (alarmHigh-alarmHyst ) )
+    else if( valueWork < (alarmHigh-alarmHyst ) )
     {
         alarmHighSent = false;
     }
     return sendAlarm;
 }
 
-bool TemperatureSensor::alarmLowCheck(double value, char* responce, int maxSize)
+bool TemperatureSensor::alarmLowCheck(char* responce, int maxSize)
 {
     bool sendAlarm = false;
-    if(value < alarmLow)
+    if(valueWork < alarmLow)
     {
         if(alarmLowActive && !alarmLowSent)
         {
@@ -156,7 +171,7 @@ bool TemperatureSensor::alarmLowCheck(double value, char* responce, int maxSize)
 
             int integerPart = 0;
             int decimalPart = 0;
-            TemperatureLogic::splitDouble(value, &integerPart, &decimalPart);
+            TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
 
             int intAlarm = 0;
             int decAlarm = 0;
@@ -167,7 +182,7 @@ bool TemperatureSensor::alarmLowCheck(double value, char* responce, int maxSize)
             sendAlarm = true;
         }
     }
-    else if( value > (alarmLow+alarmHyst) )
+    else if( valueWork > (alarmLow+alarmHyst) )
     {
         alarmLowSent = false;
     }
