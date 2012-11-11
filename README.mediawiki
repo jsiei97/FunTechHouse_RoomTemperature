@@ -5,8 +5,8 @@ This project uses a Arduino with a Ethernet shield,
 and sends its results using MQTT to a Mosquitto server.
 
 Supported sensors:
-* LM35DZ (10mV/C)
 * DS18B20 (OneWire)
+* LM35DZ (10mV/C)
 
 Fore more info: 
 * http://fun-tech.se/FunTechHouse/RoomTemperature/index.php
