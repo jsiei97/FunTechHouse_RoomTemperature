@@ -37,11 +37,9 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
     client.publish(sensors[0].getTopicPublish(), str);
 }
 
-void setup()
-{
-    //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
-    analogReference(INTERNAL); //1.1V
 
+void configure()
+{
     //Config the first sensor
     sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[0].setSensor(TemperatureSensor::LM35DZ, A2);
@@ -70,8 +68,20 @@ void setup()
             "FunTechHouse/Room3/TemperatureData",
             "FunTechHouse/Room3/Temperature"
             );
+}
 
+void setup()
+{
+    //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
+    analogReference(INTERNAL); //1.1V
+
+    //Configure this project.
+    configure();
+
+    //Start ethernet, if no ip is given then dhcp is used.
     Ethernet.begin(mac);
+
+    //Loop the sensors and tell mqtt server that we are alive.
     if (client.connect(project_name))
     {
         for( int i=0 ; i<SENSOR_CNT; i++ )
