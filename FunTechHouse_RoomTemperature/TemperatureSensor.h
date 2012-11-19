@@ -70,6 +70,7 @@ class TemperatureSensor
         bool setTopic(char* topicSubscribe, char* topicPublish);
         char* getTopicSubscribe();
         char* getTopicPublish();
+        bool checkTopicSubscribe(char* check);
 
 };
 

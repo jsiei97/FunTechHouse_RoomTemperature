@@ -20,6 +20,7 @@ class TestTemperatureSensor : public QObject
         void test_offset_data();
         void test_setSensor();
         void test_setTopic();
+        void test_checkTopic();
 };
 
 /*
@@ -255,6 +256,21 @@ void TestTemperatureSensor::test_setTopic()
 
     QCOMPARE( sensors[3].getTopicSubscribe(), "in_3" );
     QCOMPARE( sensors[3].getTopicPublish(),   "out_3" );
+}
+
+
+void TestTemperatureSensor::test_checkTopic()
+{
+    TemperatureSensor sensor;
+    sensor.setTopic("in_0", "out_0");
+
+    QCOMPARE(true,  sensor.checkTopicSubscribe("in_0"));
+    QCOMPARE(false, sensor.checkTopicSubscribe("bogus"));
+    
+
+    sensor.setTopic("house/party1/data", "out_0");
+    QCOMPARE(true,  sensor.checkTopicSubscribe("house/party1/data"));
+    QCOMPARE(false, sensor.checkTopicSubscribe("house/party2/data"));
 }
 
 QTEST_MAIN(TestTemperatureSensor)

@@ -34,7 +34,15 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
         str[i] = payload[i];
         str[i+1] = '\0';
     }
-    client.publish(sensors[0].getTopicPublish(), str);
+
+    for( int i=0 ; i<SENSOR_CNT; i++ )
+    {
+        if(true == sensors[i].checkTopicSubscribe(topic))
+        {
+            //Echo test on the same sensor
+            client.publish(sensors[i].getTopicPublish(), str);
+        }
+    }
 }
 
 

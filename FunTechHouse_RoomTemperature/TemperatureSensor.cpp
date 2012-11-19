@@ -265,3 +265,15 @@ char* TemperatureSensor::getTopicPublish()
 {
     return topicOut;
 }
+
+bool TemperatureSensor::checkTopicSubscribe(char* check)
+{
+    bool res = false;
+
+    if(0 == strcmp(check,topicIn))
+    {
+        res = true;
+    }
+
+    return res;
+}
