@@ -8,6 +8,11 @@ Supported sensors:
 * DS18B20 (OneWire)
 * LM35DZ (10mV/C)
 
+Supported humidity sensors
+* DHT 11 
+* DHT 21 / AM2301
+* DHT 22 / AM2302
+
 Fore more info: 
 * http://fun-tech.se/FunTechHouse/RoomTemperature/index.php
 
