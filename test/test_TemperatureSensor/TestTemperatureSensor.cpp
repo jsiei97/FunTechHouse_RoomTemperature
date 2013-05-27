@@ -227,18 +227,18 @@ void TestTemperatureSensor::test_setSensor()
 
     for( int i=0 ; i<3 ; i++ )
     {
-        QCOMPARE(sensors[i].getSensorType(), (int)TemperatureSensor::NO_SENSOR);
+        QCOMPARE(sensors[i].getSensorType(), (int)Sensor::NO_SENSOR);
     }
 
-    sensors[1].setSensor(TemperatureSensor::LM35DZ, 10);
+    sensors[1].setSensor(Sensor::LM35DZ, 10);
 
-    QCOMPARE(sensors[0].getSensorType(), (int)TemperatureSensor::NO_SENSOR);
+    QCOMPARE(sensors[0].getSensorType(), (int)Sensor::NO_SENSOR);
     QCOMPARE(sensors[0].getSensorPin(), 0);
 
-    QCOMPARE(sensors[1].getSensorType(), (int)TemperatureSensor::LM35DZ);
+    QCOMPARE(sensors[1].getSensorType(), (int)Sensor::LM35DZ);
     QCOMPARE(sensors[1].getSensorPin(), 10);
 
-    QCOMPARE(sensors[2].getSensorType(), (int)TemperatureSensor::NO_SENSOR);
+    QCOMPARE(sensors[2].getSensorType(), (int)Sensor::NO_SENSOR);
     QCOMPARE(sensors[2].getSensorPin(), 0);
 }
 

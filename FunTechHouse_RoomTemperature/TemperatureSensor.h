@@ -24,27 +24,17 @@
 #ifndef  __TEMPERATURESENSOR_H
 #define  __TEMPERATURESENSOR_H
 
+#include "Sensor.h"
+
 // If value is the "same" for "cnt" questions, then send anyway.
 // If sleep is 1s (1000ms) and there is 1 question per rotation
 // then we have 600/1s=600s or always send every 10min
 // 1200/1s/60s=20min
 #define ALWAYS_SEND_CNT 1200
 
-class TemperatureSensor
+class TemperatureSensor : public Sensor
 {
-    public:
-        enum SensorTypes {
-            NO_SENSOR = 0,
-            LM35DZ,
-            DS18B20 
-        };
-
     private:
-        // Variables for the sensor config
-        SensorTypes sensorType;///< What sensor is used here? See enum sensorTypes
-        int connectedPin;      ///< What pin is he connected on?
-        int sensorNumber;      ///< What object/sensor is this?
-
         //Variables for the value
         double valueWork;   ///< Active value that we work with right now
         double valueSent;   ///< Last value sent to the server
@@ -64,8 +54,7 @@ class TemperatureSensor
 
         double alarmHyst; ///< alarm level must go back this much to be reseted
 
-        char* topicIn; ///< MQTT topic for data from the server
-        char* topicOut;///< MQTT topic for data to the server
+
 
     public:
         TemperatureSensor();
@@ -79,15 +68,6 @@ class TemperatureSensor
         bool alarmLowCheck (char* responce, int maxSize);
         void alarmHighFailed();
         void alarmLowFailed();
-
-        void setSensor(SensorTypes type, int pin);
-        int getSensorType();
-        int getSensorPin();
-
-        bool setTopic(char* topicSubscribe, char* topicPublish);
-        char* getTopicSubscribe();
-        char* getTopicPublish();
-        bool checkTopicSubscribe(char* check);
 
 };
 

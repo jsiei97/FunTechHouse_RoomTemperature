@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Sensor.h"
 #include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 
@@ -34,10 +35,6 @@
  */
 TemperatureSensor::TemperatureSensor()
 {
-    // No sensor
-    sensorType = NO_SENSOR;
-    connectedPin = 0;
-
     //Some default values
     valueWork = 0.0;
     valueSent = 0.0;
@@ -54,12 +51,6 @@ TemperatureSensor::TemperatureSensor()
     alarmLowSent = false;
 
     alarmHyst = 1.0;
-
-    static int objCnt = 0;
-    sensorNumber = objCnt++;
-
-    topicIn = NULL;
-    topicOut = NULL;
 }
 
 /**
@@ -224,73 +215,3 @@ void TemperatureSensor::alarmLowFailed()
 }
 
 
-/**
- * What kind of sensor is this?
- * And where is it connected?
- *
- * Please note that for analog sensors valid pins are A0..A5,
- * and for OneWire A0..A5, 2..3 and 5..9
- * (since the ethernet board uses 4,10..13).
- *
- * @param type What type it is
- * @param pin What pin it is connected on
- */
-void TemperatureSensor::setSensor(SensorTypes type, int pin)
-{
-    sensorType = type;
-    connectedPin = pin;
-}
-
-int TemperatureSensor::getSensorType()
-{
-    return sensorType;
-}
-
-int TemperatureSensor::getSensorPin()
-{
-    return connectedPin;
-}
-
-/**
- * What mqtt topics this sensor will use.
- *
- * @param topicSubscribe data from the mqtt server
- * @param topicPublish data to the mqtt server
- * @return true if ok
- */
-bool TemperatureSensor::setTopic(char* topicSubscribe, char* topicPublish)
-{
-    int len = strlen(topicSubscribe);
-    topicIn = (char*)malloc(len+1);
-    memcpy(topicIn , topicSubscribe, len);
-    topicIn[len] = '\0';
-
-    len = strlen(topicPublish);
-    topicOut = (char*)malloc(len+1);
-    memcpy(topicOut , topicPublish, len);
-    topicOut[len] = '\0';
-
-    return true;
-}
-
-char* TemperatureSensor::getTopicSubscribe()
-{
-    return topicIn;
-}
-
-char* TemperatureSensor::getTopicPublish()
-{
-    return topicOut;
-}
-
-bool TemperatureSensor::checkTopicSubscribe(char* check)
-{
-    bool res = false;
-
-    if(0 == strcmp(check,topicIn))
-    {
-        res = true;
-    }
-
-    return res;
-}
