@@ -24,22 +24,29 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include "PubSubClient.h"
+#include "DHT.h"
 #include "DS18B20.h"
 #include "LM35DZ.h"
 #include "ValueAvg.h"
+#include "HumiditySensor.h"
 #include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 
 // Update these with values suitable for your network.
-uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
+uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xDB };
 
 // The MQTT device name, this must be unique
-char project_name[] = "FunTechHouse_RoomTemperature";
+char project_name[] = "FunTechHouse_KCC_735EA";
 
-#define SENSOR_CNT 3
-TemperatureSensor sensors[SENSOR_CNT];
+#define SENSOR_CNT 1
+HumiditySensor sensors[SENSOR_CNT];
 
 PubSubClient client("mosqhub", 1883, callback);
+
+/// @todo Make it play nicer with the others...
+DHT dht(2, DHT22);
+int outPWM = 6; // PWM to KCC board
+
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
 {
@@ -72,42 +79,30 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
 void configure()
 {
     //Config the first sensor
-    sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[0].setSensor(Sensor::LM35DZ, A2);
-    sensors[0].setDiffToSend(1.4);
-    pinMode(A2, INPUT); //Is this needed?
+    sensors[0].setAlarmLevels(
+            25.0, true, 15.0, true, 
+            70.0, true, 40.0, true);
+    sensors[0].setSensor(Sensor::DHT_22, 2);
+    sensors[0].setDiffToSend(0.5, 2.0);
     sensors[0].setTopic(
-            "FunTechHouse/Room1/TemperatureData",
-            "FunTechHouse/Room1/Temperature"
+            "FunTechHouse/Room1/HumidityData",
+            "FunTechHouse/Room1/Humidity"
             );
 
-    //Then configure a second sensor
-    sensors[1].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[1].setSensor(Sensor::LM35DZ, A3);
-    sensors[1].setDiffToSend(1.4);
-    pinMode(A3, INPUT); //Is this needed?
-    sensors[1].setTopic(
-            "FunTechHouse/Room2/TemperatureData",
-            "FunTechHouse/Room2/Temperature"
-            );
-
-    //And a third, that is a DS18B20
-    sensors[2].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[2].setSensor(Sensor::DS18B20, 2);
-    sensors[2].setDiffToSend(0.2);
-    sensors[2].setTopic(
-            "FunTechHouse/Room3/TemperatureData",
-            "FunTechHouse/Room3/Temperature"
-            );
 }
 
 void setup()
 {
+    pinMode(outPWM, OUTPUT);   // sets the pin as output
+
     //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
     analogReference(INTERNAL); //1.1V
 
     //Configure this project.
     configure();
+
+    /// @todo Make it play nicer with the others...
+    dht.begin();
 
     //Start ethernet, if no ip is given then dhcp is used.
     Ethernet.begin(mac);
@@ -136,38 +131,37 @@ void loop()
     for( int i=0 ; i<SENSOR_CNT; i++ )
     {
         double temperature = 0;
+        double humidity    = 0;
         bool readOk = false;
 
-        if( ((int)Sensor::LM35DZ) == sensors[i].getSensorType() )
+        if( ((int)Sensor::DHT_22) == sensors[i].getSensorType() )
         {
-            //There is some noice so take a avg on some samples
-            //so we don't see the noice as much...
-            filter.init();
-            for( int j=0 ; j<9 ; j++ )
-            {
-                int reading = analogRead(sensors[i].getSensorPin());
-                filter.addValue( LM35DZ::analog11_to_temperature(reading) );
-            }
-            temperature = filter.getValue();
+            //Add the DHT set pin and reinit here, if needed...
 
-            //No sensor connected becomes 109deg,
-            //so lets just ignore values higher than 105
-            if(temperature <= 105.0 && temperature != 0.0)
-            {
+            // Reading temperature or humidity takes about 250 milliseconds!
+            // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+            humidity    = dht.readHumidity();
+            temperature = dht.readTemperature();
+
+            // check if returns are valid, if they are NaN (not a number) then something went wrong!
+            if (isnan(temperature) || isnan(humidity)) {
+                //Serial.println("Failed to read from DHT");
+                readOk = false;
+            } else {
                 readOk = true;
-            }
-        }
-        else if( ((int)Sensor::DS18B20) == sensors[i].getSensorType() )
-        {
-            temperature = DS18B20::getTemperature(sensors[i].getSensorPin());
-            //This functions returns 0.0 when something is wrong,
-            //maybe not the best value... let's change that some day....
-            //
-            //And 85.0 is the DS18B20 default error value,
-            //so ignore that as well...
-            if(temperature != 0.0 && temperature != 85.0)
-            {
-                readOk = true;
+
+                //Send a value to the KCC
+
+                // 5V/0xFF = 0,0196V/steg
+                // 1V/0,0196=>51 steg
+                //val = 0xFF; //Max vid 3,8V pga OP
+                //val = 0x80; //2.5V
+                //val = 0x40; //1,27V
+
+                //humidity=humidity*1.63;
+                // analogWrite values from 0 to 255
+                analogWrite(outPWM, (int)(humidity*1.63));  
+
             }
         }
 
@@ -178,15 +172,20 @@ void loop()
                 client.connect(project_name);
             }
 
-            char str[40];
+            char str[80];
 
             //Check and save the current value
-            if( sensors[i].valueTimeToSend(temperature) )
+            if( sensors[i].valueTimeToSend(temperature, humidity) )
             {
                 int intPart = 0;
                 int decPart = 0;
                 TemperatureLogic::splitDouble(temperature, &intPart, &decPart);
-                snprintf(str, 40, "temperature=%d.%d", intPart, decPart);
+
+                int intPartHum = 0;
+                int decPartHum = 0;
+                TemperatureLogic::splitDouble(humidity, &intPartHum, &decPartHum);
+                snprintf(str, 80, "Temperature=%d.%d : Humidity=%d.%d", 
+                        intPart, decPart, intPartHum, decPartHum);
 
                 if(client.connected())
                 {
@@ -194,19 +193,11 @@ void loop()
                 }
             }
 
-            if(sensors[i].alarmHighCheck(str, 40))
+            if(sensors[i].alarmCheck(str, 80))
             {
                 if( (false == client.connected()) || (false == client.publish(sensors[i].getTopicPublish(), str)) )
                 {
-                    sensors[i].alarmHighFailed();
-                }
-            }
-
-            if(sensors[i].alarmLowCheck(str, 40))
-            {
-                if( (false == client.connected()) || (false == client.publish(sensors[i].getTopicPublish(), str)) )
-                {
-                    sensors[i].alarmLowFailed();
+                    sensors[i].alarmFailed();
                 }
             }
         }

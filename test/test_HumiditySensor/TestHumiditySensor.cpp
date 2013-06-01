@@ -341,24 +341,24 @@ void TestHumiditySensor::test_setSensor()
         QCOMPARE(sensors[i].getSensorType(), (int)Sensor::NO_SENSOR);
     }
 
-    sensors[1].setSensor(Sensor::DHT22, 10);
+    sensors[1].setSensor(Sensor::DHT_22, 10);
 
     QCOMPARE(sensors[0].getSensorType(), (int)Sensor::NO_SENSOR);
     QCOMPARE(sensors[0].getSensorPin(), 0);
 
-    QCOMPARE(sensors[1].getSensorType(), (int)Sensor::DHT22);
+    QCOMPARE(sensors[1].getSensorType(), (int)Sensor::DHT_22);
     QCOMPARE(sensors[1].getSensorPin(), 10);
 
     QCOMPARE(sensors[2].getSensorType(), (int)Sensor::NO_SENSOR);
     QCOMPARE(sensors[2].getSensorPin(), 0);
 
 
-    sensors[0].setSensor(Sensor::DHT11, 8);
-    QCOMPARE(sensors[0].getSensorType(), (int)Sensor::DHT11);
+    sensors[0].setSensor(Sensor::DHT_11, 8);
+    QCOMPARE(sensors[0].getSensorType(), (int)Sensor::DHT_11);
     QCOMPARE(sensors[0].getSensorPin(), 8);
 
-    sensors[1].setSensor(Sensor::DHT21, 9);
-    QCOMPARE(sensors[1].getSensorType(), (int)Sensor::DHT21);
+    sensors[1].setSensor(Sensor::DHT_21, 9);
+    QCOMPARE(sensors[1].getSensorType(), (int)Sensor::DHT_21);
     QCOMPARE(sensors[1].getSensorPin(), 9);
 
 }
