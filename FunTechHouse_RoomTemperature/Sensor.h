@@ -29,8 +29,11 @@ class Sensor
     public:
         enum SensorTypes {
             NO_SENSOR = 0,
-            LM35DZ,
-            DS18B20 
+            LM35DZ,  ///< Temperature sensor, 10mV per deg 
+            DS18B20, ///< Temperature sensor, 1wire
+            DHT11,   ///< Humidity and temperature sensor DHT11
+            DHT21,   ///< Humidity and temperature sensor DHT21, AM2301
+            DHT22    ///< Humidity and temperature sensor DHT22, AM2302
         };
 
     protected:
