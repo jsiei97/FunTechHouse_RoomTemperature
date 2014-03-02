@@ -1,0 +1,3 @@
+[submodule "mod/FT_Sensor"]
+	path = mod/FT_Sensor
+	url = git@github.com:jsiei97/FT_Sensor.git
