@@ -1,3 +1,6 @@
 [submodule "mod/FT_Sensor"]
 	path = mod/FT_Sensor
 	url = git@github.com:jsiei97/FT_Sensor.git
+[submodule "mod/pubsubclient"]
+	path = mod/pubsubclient
+	url = git@github.com:jsiei97/pubsubclient.git
