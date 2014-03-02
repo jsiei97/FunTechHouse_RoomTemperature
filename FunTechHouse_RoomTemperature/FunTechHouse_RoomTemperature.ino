@@ -24,11 +24,11 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include "PubSubClient.h"
-#include "DS18B20.h"
-#include "LM35DZ.h"
-#include "ValueAvg.h"
 #include "Sensor.h"
+#include "TemperatureSensor.h"
+#include "SensorTypes.h"
 #include "TemperatureLogic.h"
+
 
 // Update these with values suitable for your network.
 uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
@@ -37,10 +37,13 @@ uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
 char project_name[] = "FunTechHouse_RoomTemperature";
 
 #define SENSOR_CNT 3
-Sensor sensors[SENSOR_CNT];
+Sensor sensor[SENSOR_CNT];
 
 EthernetClient ethClient;
 PubSubClient client("mosqhub", 1883, callback, ethClient);
+
+#define OUT_STR_MAX 256
+
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
 {
@@ -61,10 +64,10 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
 
     for( int i=0 ; i<SENSOR_CNT; i++ )
     {
-        if(true == sensors[i].checkTopicSubscribe(topic))
+        if(true == sensor[i].checkTopicSubscribe(topic))
         {
             //Echo test on the same sensor
-            client.publish(sensors[i].getTopicPublish(), str);
+            client.publish(sensor[i].getTopicPublish(), str);
         }
     }
 }
@@ -73,33 +76,36 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
 void configure()
 {
     //Config the first sensor
-    sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[0].setSensor(Sensor::LM35DZ, A2);
-    sensors[0].setDiffToSend(1.4);
-    pinMode(A2, INPUT); //Is this needed?
-    sensors[0].setTopic(
+    sensor[0].init(A2, SENSOR_LVTS_LM35);
+    sensor[0].setAlarmLevels(1.0, true, 25.0, true, 22.0);
+    sensor[0].setValueDiff(1.4);
+    sensor[0].setValueMaxCnt(30*60); //30*60s=>30min
+    sensor[0].setTopic(
             "FunTechHouse/Room1/TemperatureData",
             "FunTechHouse/Room1/Temperature"
             );
 
+    /*
     //Then configure a second sensor
     sensors[1].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[1].setSensor(Sensor::LM35DZ, A3);
     sensors[1].setDiffToSend(1.4);
     pinMode(A3, INPUT); //Is this needed?
     sensors[1].setTopic(
-            "FunTechHouse/Room2/TemperatureData",
-            "FunTechHouse/Room2/Temperature"
-            );
+    "FunTechHouse/Room2/TemperatureData",
+    "FunTechHouse/Room2/Temperature"
+    );
 
     //And a third, that is a DS18B20
     sensors[2].setAlarmLevels(true, 25.0, true, 22.0);
     sensors[2].setSensor(Sensor::DS18B20, 2);
+    sensor[2].init(2, SENSOR_DS18B20);
     sensors[2].setDiffToSend(0.2);
     sensors[2].setTopic(
-            "FunTechHouse/Room3/TemperatureData",
-            "FunTechHouse/Room3/Temperature"
-            );
+    "FunTechHouse/Room3/TemperatureData",
+    "FunTechHouse/Room3/Temperature"
+    );
+    */
 }
 
 void setup()
@@ -118,8 +124,8 @@ void setup()
     {
         for( int i=0 ; i<SENSOR_CNT; i++ )
         {
-            client.publish( sensors[i].getTopicPublish(), "#Hello world" );
-            client.subscribe( sensors[i].getTopicSubscribe() );
+            client.publish( sensor[i].getTopicPublish(), "#Hello world" );
+            client.subscribe( sensor[i].getTopicSubscribe() );
         }
     }
 }
@@ -132,86 +138,44 @@ void loop()
         client.connect(project_name);
     }
 
+    char str[OUT_STR_MAX];
 
-    ValueAvg filter;
     for( int i=0 ; i<SENSOR_CNT; i++ )
     {
-        double temperature = 0;
-        bool readOk = false;
-
-        if( ((int)Sensor::LM35DZ) == sensors[i].getSensorType() )
+        if(false == client.connected())
         {
-            //There is some noice so take a avg on some samples
-            //so we don't see the noice as much...
-            filter.init();
-            for( int j=0 ; j<9 ; j++ )
-            {
-                int reading = analogRead(sensors[i].getSensorPin());
-                filter.addValue( LM35DZ::analog11_to_temperature(reading) );
-            }
-            temperature = filter.getValue();
-
-            //No sensor connected becomes 109deg,
-            //so lets just ignore values higher than 105
-            if(temperature <= 105.0 && temperature != 0.0)
-            {
-                readOk = true;
-            }
+            client.connect(project_name);
         }
-        else if( ((int)Sensor::DS18B20) == sensors[i].getSensorType() )
+
+        if( sensor[i].getTemperature(str, OUT_STR_MAX) )
         {
-            temperature = DS18B20::getTemperature(sensors[i].getSensorPin());
-            //This functions returns 0.0 when something is wrong,
-            //maybe not the best value... let's change that some day....
-            //
-            //And 85.0 is the DS18B20 default error value,
-            //so ignore that as well...
-            if(temperature != 0.0 && temperature != 85.0)
+            if(client.connected())
             {
-                readOk = true;
+                client.publish(sensor[i].getTopicPublish(), str);
             }
         }
 
-        if(true == readOk)
+        //Now loop, send and Ack if there is any alarms
+        int maxCnt = 20;
+        SensorAlarmNumber num;
+        do
         {
-            if(false == client.connected())
+            num = sensor[i].alarmCheck(str, OUT_STR_MAX);
+            if(num != SENSOR_ALARM_NO)
             {
-                client.connect(project_name);
-            }
-
-            char str[40];
-
-            //Check and save the current value
-            if( sensors[i].valueTimeToSend(temperature) )
-            {
-                int intPart = 0;
-                int decPart = 0;
-                TemperatureLogic::splitDouble(temperature, &intPart, &decPart);
-                snprintf(str, 40, "temperature=%d.%d", intPart, decPart);
-
-                if(client.connected())
+                if(
+                        (true == client.connected()) &&
+                        (true == client.publish(sensor[i].getTopicPublish(), str)) )
                 {
-                    client.publish(sensors[i].getTopicPublish(), str);
+                    sensor[i].alarmAck(num);
                 }
             }
 
-            if(sensors[i].alarmHighCheck(str, 40))
-            {
-                if( (false == client.connected()) || (false == client.publish(sensors[i].getTopicPublish(), str)) )
-                {
-                    sensors[i].alarmHighFailed();
-                }
-            }
-
-            if(sensors[i].alarmLowCheck(str, 40))
-            {
-                if( (false == client.connected()) || (false == client.publish(sensors[i].getTopicPublish(), str)) )
-                {
-                    sensors[i].alarmLowFailed();
-                }
-            }
+            maxCnt--;
         }
+        while( num != SENSOR_ALARM_NO && maxCnt != 0);
+
+
     }
-
     delay(1000);
 }

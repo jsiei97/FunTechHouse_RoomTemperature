@@ -26,225 +26,62 @@
 #include <string.h>
 
 #include "Sensor.h"
+#include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 
-/**
- * Default constructur,
- * please note that all alarm are disabled.
- */
-Sensor::Sensor()
+
+bool Sensor::getTemperature(char* str, int size)
 {
-    // No sensor
-    sensorType = NO_SENSOR;
-    connectedPin = 0;
-
-    //Some default values
-    valueWork = 0.0;
-    valueSent = 0.0;
-    valueDiffMax = 0.8;
-    valueSendCnt = 0;
-    valueOffset = 0;
-
-    alarmHigh = 25.0;
-    alarmHighActive = false;
-    alarmHighSent = false;
-
-    alarmLow = 20.0;
-    alarmLowActive = false;
-    alarmLowSent = false;
-
-    alarmHyst = 1.0;
-
-    static int objCnt = 0;
-    sensorNumber = objCnt++;
-}
-
-/**
- * Is it time to send a new value to the server,
- * this is triggered either on change or timeout.
- *
- * @param value The new temperature
- * @return true if it is time to send
- */
-bool Sensor::valueTimeToSend(double value)
-{
-    valueWork = value+valueOffset;
-
-    //Timeout lets send anyway
-    if(0 == valueSendCnt)
+    double temperature;
+    if( TemperatureSensor::getTemperature(&temperature) )
     {
-        valueSent = value;
-        valueSendCnt = ALWAYS_SEND_CNT;
+        int intPart = 0;
+        int decPart = 0;
+        TemperatureLogic::splitDouble(temperature, &intPart, &decPart);
+        snprintf(str, size, "temperature=%d.%d", intPart, decPart);
         return true;
     }
-
-    //Check if diff is bigger than diff max
-    if(value>valueSent)
-    {
-        if((value-valueSent) > valueDiffMax)
-        {
-            valueSent = value;
-            valueSendCnt = ALWAYS_SEND_CNT;
-            return true;
-        }
-    }
-
-    //Check if negative diff is bigger than diff max
-    if(value<valueSent)
-    {
-        if((valueSent-value) > valueDiffMax)
-        {
-            valueSent = value;
-            valueSendCnt = ALWAYS_SEND_CNT;
-            return true;
-        }
-    }
-
-    valueSendCnt--;
     return false;
 }
 
-/**
- * Activate high and low alarm.
- *
- * @param activeHigh true will active the high alarm
- * @param high the high alarm level
- * @param activeLow true will active the low alarm
- * @param low the low alarm level
- */
-void Sensor::setAlarmLevels(bool activeHigh, double high, bool activeLow, double low)
+
+SensorAlarmNumber Sensor::alarmCheck(char* str, int size)
 {
-    alarmHighActive = activeHigh;
-    alarmHigh = high;
-    alarmHighSent = false;
-
-    alarmLowActive = activeLow;
-    alarmLow = low;
-    alarmLowSent = false;
-}
-
-
-/**
- * How much must the value change before we send it?
- *
- * @param value if value is set to X, then we send directly if the messured value diff more than X from the last sent value.
- */
-void Sensor::setDiffToSend(double value)
-{
-    valueDiffMax = value;
-}
-
-/**
- * If a sensor has a static measurment error, 
- * this offset value can be added to correct such a error.
- *
- * @param value the offset value that will be added
- */
-void Sensor::setValueOffset(double value)
-{
-    valueOffset = value;
-}
-
-bool Sensor::alarmHighCheck(char* responce, int maxSize)
-{
-    bool sendAlarm = false;
-    if(valueWork > alarmHigh)
+    SensorAlarmNumber num = TemperatureSensor::alarmCheck();
+    switch ( num )
     {
-        if(alarmHighActive && !alarmHighSent)
-        {
-            alarmHighSent = true;
+        case SENSOR_ALARM_SENSOR:
+            snprintf(str, size, "Alarm: Sensor error");
+            break;
+        case SENSOR_ALARM_HIGH:
+            {
+                int integerPart = 0;
+                int decimalPart = 0;
+                TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
 
-            int integerPart = 0;
-            int decimalPart = 0;
-            TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
+                int intAlarm = 0;
+                int decAlarm = 0;
+                TemperatureLogic::splitDouble(alarmHighLevel, &intAlarm, &decAlarm);
 
-            int intAlarm = 0;
-            int decAlarm = 0;
-            TemperatureLogic::splitDouble(alarmHigh, &intAlarm, &decAlarm);
+                snprintf(str, size, "Alarm: High temperature=%d.%d level=%d.%d",
+                        integerPart, decimalPart, intAlarm, decAlarm);
+            }
+            break;
+        case SENSOR_ALARM_LOW:
+            {
+                int integerPart = 0;
+                int decimalPart = 0;
+                TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
 
-            snprintf(responce, maxSize, "Alarm: High temperature=%d.%d level=%d.%d",
-                    integerPart, decimalPart, intAlarm, decAlarm);
-            sendAlarm = true;
-        }
-    }
-    else if( valueWork < (alarmHigh-alarmHyst ) )
-    {
-        alarmHighSent = false;
-    }
-    return sendAlarm;
-}
+                int intAlarm = 0;
+                int decAlarm = 0;
+                TemperatureLogic::splitDouble(alarmLowLevel, &intAlarm, &decAlarm);
 
-bool Sensor::alarmLowCheck(char* responce, int maxSize)
-{
-    bool sendAlarm = false;
-    if(valueWork < alarmLow)
-    {
-        if(alarmLowActive && !alarmLowSent)
-        {
-            alarmLowSent = true;
-
-            int integerPart = 0;
-            int decimalPart = 0;
-            TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
-
-            int intAlarm = 0;
-            int decAlarm = 0;
-            TemperatureLogic::splitDouble(alarmLow, &intAlarm, &decAlarm);
-
-            snprintf(responce, maxSize, "Alarm: Low temperature=%d.%d level=%d.%d",
-                    integerPart, decimalPart, intAlarm, decAlarm);
-            sendAlarm = true;
-        }
-    }
-    else if( valueWork > (alarmLow+alarmHyst) )
-    {
-        alarmLowSent = false;
+                snprintf(str, size, "Alarm: Low temperature=%d.%d level=%d.%d",
+                        integerPart, decimalPart, intAlarm, decAlarm);
+            }
+            break;
     }
 
-    return sendAlarm;
+    return num;
 }
-
-/**
- * Tell the logic that we did not send that alarm.
- */
-void Sensor::alarmHighFailed()
-{
-    alarmHighSent = false;
-}
-
-/**
- * Tell the logic that we did not send that alarm.
- */
-void Sensor::alarmLowFailed()
-{
-    alarmLowSent = false;
-}
-
-
-/**
- * What kind of sensor is this?
- * And where is it connected?
- *
- * Please note that for analog sensors valid pins are A0..A5,
- * and for OneWire A0..A5, 2..3 and 5..9
- * (since the ethernet board uses 4,10..13).
- *
- * @param type What type it is
- * @param pin What pin it is connected on
- */
-void Sensor::setSensor(SensorTypes type, int pin)
-{
-    sensorType = type;
-    connectedPin = pin;
-}
-
-int Sensor::getSensorType()
-{
-    return sensorType;
-}
-
-int Sensor::getSensorPin()
-{
-    return connectedPin;
-}
-
