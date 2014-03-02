@@ -36,7 +36,7 @@ uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
 // The MQTT device name, this must be unique
 char project_name[] = "FunTechHouse_RoomTemperature";
 
-#define SENSOR_CNT 3
+#define SENSOR_CNT 2
 Sensor sensor[SENSOR_CNT];
 
 EthernetClient ethClient;
@@ -76,8 +76,8 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
 void configure()
 {
     //Config the first sensor
-    sensor[0].init(A2, SENSOR_LVTS_LM35);
-    sensor[0].setAlarmLevels(1.0, true, 25.0, true, 22.0);
+    sensor[0].init(A0, SENSOR_LVTS_LM35);
+    sensor[0].setAlarmLevels(1.0, true, 24.0, true, 18.0);
     sensor[0].setValueDiff(1.4);
     sensor[0].setValueMaxCnt(30*60); //30*60s=>30min
     sensor[0].setTopic(
@@ -85,27 +85,15 @@ void configure()
             "FunTechHouse/Room1/Temperature"
             );
 
-    /*
-    //Then configure a second sensor
-    sensors[1].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[1].setSensor(Sensor::LM35DZ, A3);
-    sensors[1].setDiffToSend(1.4);
-    pinMode(A3, INPUT); //Is this needed?
-    sensors[1].setTopic(
-    "FunTechHouse/Room2/TemperatureData",
-    "FunTechHouse/Room2/Temperature"
-    );
-
-    //And a third, that is a DS18B20
-    sensors[2].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[2].setSensor(Sensor::DS18B20, 2);
-    sensor[2].init(2, SENSOR_DS18B20);
-    sensors[2].setDiffToSend(0.2);
-    sensors[2].setTopic(
-    "FunTechHouse/Room3/TemperatureData",
-    "FunTechHouse/Room3/Temperature"
-    );
-    */
+    //And a second, that is a DS18B20
+    sensor[1].init(A1, SENSOR_DS18B20);
+    sensor[1].setAlarmLevels(1.0, true, 24.0, true, 18.0);
+    sensor[1].setValueDiff(1.0);
+    sensor[1].setValueMaxCnt(30*60); //30*60s=>30min
+    sensor[1].setTopic(
+            "FunTechHouse/Room2/TemperatureData",
+            "FunTechHouse/Room2/Temperature"
+            );
 }
 
 void setup()
