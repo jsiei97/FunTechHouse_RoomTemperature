@@ -21,8 +21,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef  __TEMPERATURESENSOR_H
-#define  __TEMPERATURESENSOR_H
+#ifndef  __SENSOR_H
+#define  __SENSOR_H
+
+#include "MQTT_Logic.h"
 
 // If value is the "same" for "cnt" questions, then send anyway.
 // If sleep is 1s (1000ms) and there is 1 question per rotation
@@ -30,7 +32,7 @@
 // 1200/1s/60s=20min
 #define ALWAYS_SEND_CNT 1200
 
-class TemperatureSensor
+class Sensor : public MQTT_Logic
 {
     public:
         enum SensorTypes {
@@ -64,11 +66,8 @@ class TemperatureSensor
 
         double alarmHyst; ///< alarm level must go back this much to be reseted
 
-        char* topicIn; ///< MQTT topic for data from the server
-        char* topicOut;///< MQTT topic for data to the server
-
     public:
-        TemperatureSensor();
+        Sensor();
 
         bool valueTimeToSend(double value);
         void setDiffToSend(double value);
@@ -84,11 +83,6 @@ class TemperatureSensor
         int getSensorType();
         int getSensorPin();
 
-        bool setTopic(char* topicSubscribe, char* topicPublish);
-        char* getTopicSubscribe();
-        char* getTopicPublish();
-        bool checkTopicSubscribe(char* check);
-
 };
 
-#endif  // __TEMPERATURESENSOR_H
+#endif  // __SENSOR_H 

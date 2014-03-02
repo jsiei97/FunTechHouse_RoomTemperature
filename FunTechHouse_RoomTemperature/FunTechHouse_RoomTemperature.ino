@@ -27,7 +27,7 @@
 #include "DS18B20.h"
 #include "LM35DZ.h"
 #include "ValueAvg.h"
-#include "TemperatureSensor.h"
+#include "Sensor.h"
 #include "TemperatureLogic.h"
 
 // Update these with values suitable for your network.
@@ -37,7 +37,7 @@ uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
 char project_name[] = "FunTechHouse_RoomTemperature";
 
 #define SENSOR_CNT 3
-TemperatureSensor sensors[SENSOR_CNT];
+Sensor sensors[SENSOR_CNT];
 
 EthernetClient ethClient;
 PubSubClient client("mosqhub", 1883, callback, ethClient);
@@ -74,7 +74,7 @@ void configure()
 {
     //Config the first sensor
     sensors[0].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[0].setSensor(TemperatureSensor::LM35DZ, A2);
+    sensors[0].setSensor(Sensor::LM35DZ, A2);
     sensors[0].setDiffToSend(1.4);
     pinMode(A2, INPUT); //Is this needed?
     sensors[0].setTopic(
@@ -84,7 +84,7 @@ void configure()
 
     //Then configure a second sensor
     sensors[1].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[1].setSensor(TemperatureSensor::LM35DZ, A3);
+    sensors[1].setSensor(Sensor::LM35DZ, A3);
     sensors[1].setDiffToSend(1.4);
     pinMode(A3, INPUT); //Is this needed?
     sensors[1].setTopic(
@@ -94,7 +94,7 @@ void configure()
 
     //And a third, that is a DS18B20
     sensors[2].setAlarmLevels(true, 25.0, true, 22.0);
-    sensors[2].setSensor(TemperatureSensor::DS18B20, 2);
+    sensors[2].setSensor(Sensor::DS18B20, 2);
     sensors[2].setDiffToSend(0.2);
     sensors[2].setTopic(
             "FunTechHouse/Room3/TemperatureData",
@@ -139,7 +139,7 @@ void loop()
         double temperature = 0;
         bool readOk = false;
 
-        if( ((int)TemperatureSensor::LM35DZ) == sensors[i].getSensorType() )
+        if( ((int)Sensor::LM35DZ) == sensors[i].getSensorType() )
         {
             //There is some noice so take a avg on some samples
             //so we don't see the noice as much...
@@ -158,7 +158,7 @@ void loop()
                 readOk = true;
             }
         }
-        else if( ((int)TemperatureSensor::DS18B20) == sensors[i].getSensorType() )
+        else if( ((int)Sensor::DS18B20) == sensors[i].getSensorType() )
         {
             temperature = DS18B20::getTemperature(sensors[i].getSensorPin());
             //This functions returns 0.0 when something is wrong,

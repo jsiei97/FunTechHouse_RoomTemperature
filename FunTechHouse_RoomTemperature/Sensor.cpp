@@ -1,5 +1,5 @@
 /**
- * @file TemperatureSensor.cpp
+ * @file Sensor.cpp
  * @author Johan Simonsson
  * @brief A temperature sensor class with alarm logic
  */
@@ -25,14 +25,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "TemperatureSensor.h"
+#include "Sensor.h"
 #include "TemperatureLogic.h"
 
 /**
  * Default constructur,
  * please note that all alarm are disabled.
  */
-TemperatureSensor::TemperatureSensor()
+Sensor::Sensor()
 {
     // No sensor
     sensorType = NO_SENSOR;
@@ -57,9 +57,6 @@ TemperatureSensor::TemperatureSensor()
 
     static int objCnt = 0;
     sensorNumber = objCnt++;
-
-    topicIn = NULL;
-    topicOut = NULL;
 }
 
 /**
@@ -69,7 +66,7 @@ TemperatureSensor::TemperatureSensor()
  * @param value The new temperature
  * @return true if it is time to send
  */
-bool TemperatureSensor::valueTimeToSend(double value)
+bool Sensor::valueTimeToSend(double value)
 {
     valueWork = value+valueOffset;
 
@@ -115,7 +112,7 @@ bool TemperatureSensor::valueTimeToSend(double value)
  * @param activeLow true will active the low alarm
  * @param low the low alarm level
  */
-void TemperatureSensor::setAlarmLevels(bool activeHigh, double high, bool activeLow, double low)
+void Sensor::setAlarmLevels(bool activeHigh, double high, bool activeLow, double low)
 {
     alarmHighActive = activeHigh;
     alarmHigh = high;
@@ -132,7 +129,7 @@ void TemperatureSensor::setAlarmLevels(bool activeHigh, double high, bool active
  *
  * @param value if value is set to X, then we send directly if the messured value diff more than X from the last sent value.
  */
-void TemperatureSensor::setDiffToSend(double value)
+void Sensor::setDiffToSend(double value)
 {
     valueDiffMax = value;
 }
@@ -143,12 +140,12 @@ void TemperatureSensor::setDiffToSend(double value)
  *
  * @param value the offset value that will be added
  */
-void TemperatureSensor::setValueOffset(double value)
+void Sensor::setValueOffset(double value)
 {
     valueOffset = value;
 }
 
-bool TemperatureSensor::alarmHighCheck(char* responce, int maxSize)
+bool Sensor::alarmHighCheck(char* responce, int maxSize)
 {
     bool sendAlarm = false;
     if(valueWork > alarmHigh)
@@ -177,7 +174,7 @@ bool TemperatureSensor::alarmHighCheck(char* responce, int maxSize)
     return sendAlarm;
 }
 
-bool TemperatureSensor::alarmLowCheck(char* responce, int maxSize)
+bool Sensor::alarmLowCheck(char* responce, int maxSize)
 {
     bool sendAlarm = false;
     if(valueWork < alarmLow)
@@ -210,7 +207,7 @@ bool TemperatureSensor::alarmLowCheck(char* responce, int maxSize)
 /**
  * Tell the logic that we did not send that alarm.
  */
-void TemperatureSensor::alarmHighFailed()
+void Sensor::alarmHighFailed()
 {
     alarmHighSent = false;
 }
@@ -218,7 +215,7 @@ void TemperatureSensor::alarmHighFailed()
 /**
  * Tell the logic that we did not send that alarm.
  */
-void TemperatureSensor::alarmLowFailed()
+void Sensor::alarmLowFailed()
 {
     alarmLowSent = false;
 }
@@ -235,62 +232,19 @@ void TemperatureSensor::alarmLowFailed()
  * @param type What type it is
  * @param pin What pin it is connected on
  */
-void TemperatureSensor::setSensor(SensorTypes type, int pin)
+void Sensor::setSensor(SensorTypes type, int pin)
 {
     sensorType = type;
     connectedPin = pin;
 }
 
-int TemperatureSensor::getSensorType()
+int Sensor::getSensorType()
 {
     return sensorType;
 }
 
-int TemperatureSensor::getSensorPin()
+int Sensor::getSensorPin()
 {
     return connectedPin;
 }
 
-/**
- * What mqtt topics this sensor will use.
- *
- * @param topicSubscribe data from the mqtt server
- * @param topicPublish data to the mqtt server
- * @return true if ok
- */
-bool TemperatureSensor::setTopic(char* topicSubscribe, char* topicPublish)
-{
-    int len = strlen(topicSubscribe);
-    topicIn = (char*)malloc(len+1);
-    memcpy(topicIn , topicSubscribe, len);
-    topicIn[len] = '\0';
-
-    len = strlen(topicPublish);
-    topicOut = (char*)malloc(len+1);
-    memcpy(topicOut , topicPublish, len);
-    topicOut[len] = '\0';
-
-    return true;
-}
-
-char* TemperatureSensor::getTopicSubscribe()
-{
-    return topicIn;
-}
-
-char* TemperatureSensor::getTopicPublish()
-{
-    return topicOut;
-}
-
-bool TemperatureSensor::checkTopicSubscribe(char* check)
-{
-    bool res = false;
-
-    if(0 == strcmp(check,topicIn))
-    {
-        res = true;
-    }
-
-    return res;
-}
