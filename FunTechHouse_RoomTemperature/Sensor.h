@@ -32,9 +32,9 @@ class Sensor : public MQTT_Logic, public TemperatureSensor
 {
     private:
     public:
-        bool getTemperature(char* str, int size);
+        bool getTemperatureString(char* str, int size);
 
-        SensorAlarmNumber alarmCheck(char* str, int size);
+        SensorAlarmNumber alarmCheckString(char* str, int size);
 };
 
 #endif  // __SENSOR_H

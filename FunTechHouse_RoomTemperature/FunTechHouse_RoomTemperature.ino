@@ -135,7 +135,7 @@ void loop()
             client.connect(project_name);
         }
 
-        if( sensor[i].getTemperature(str, OUT_STR_MAX) )
+        if( sensor[i].getTemperatureString(str, OUT_STR_MAX) )
         {
             if(client.connected())
             {
@@ -148,7 +148,7 @@ void loop()
         SensorAlarmNumber num;
         do
         {
-            num = sensor[i].alarmCheck(str, OUT_STR_MAX);
+            num = sensor[i].alarmCheckString(str, OUT_STR_MAX);
             if(num != SENSOR_ALARM_NO)
             {
                 if(

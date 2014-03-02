@@ -26,14 +26,13 @@
 #include <string.h>
 
 #include "Sensor.h"
-#include "TemperatureSensor.h"
 #include "TemperatureLogic.h"
 
 
-bool Sensor::getTemperature(char* str, int size)
+bool Sensor::getTemperatureString(char* str, int size)
 {
     double temperature;
-    if( TemperatureSensor::getTemperature(&temperature) )
+    if( getTemperature(&temperature) )
     {
         int intPart = 0;
         int decPart = 0;
@@ -45,9 +44,9 @@ bool Sensor::getTemperature(char* str, int size)
 }
 
 
-SensorAlarmNumber Sensor::alarmCheck(char* str, int size)
+SensorAlarmNumber Sensor::alarmCheckString(char* str, int size)
 {
-    SensorAlarmNumber num = TemperatureSensor::alarmCheck();
+    SensorAlarmNumber num = alarmCheck();
     switch ( num )
     {
         case SENSOR_ALARM_SENSOR:
