@@ -42,7 +42,9 @@ Sensor sensor[SENSOR_CNT];
 EthernetClient ethClient;
 PubSubClient client("mosqhub", 1883, callback, ethClient);
 
-#define OUT_STR_MAX 256
+#define OUT_STR_MAX 100
+
+int led = 2;
 
 
 void callback(char* topic, uint8_t* payload, unsigned int length)
@@ -50,6 +52,7 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
     //1. What topic is it? aka to what sensor will the result go?
     //2. Parse the payload and update the correct sensor
 
+    /*
     // handle message arrived
     char str[256];
     //snprintf(str, 256, "echo len=%d __%s__:__%s__", length, topic, payload);
@@ -70,6 +73,7 @@ void callback(char* topic, uint8_t* payload, unsigned int length)
             client.publish(sensor[i].getTopicPublish(), str);
         }
     }
+    */
 }
 
 
@@ -77,7 +81,7 @@ void configure()
 {
     //Config the first sensor
     sensor[0].init(A0, SENSOR_LVTS_LM35);
-    sensor[0].setAlarmLevels(1.0, true, 24.0, true, 18.0);
+    sensor[0].setAlarmLevels(1.0, true, 17.0, true, 24.0);
     sensor[0].setValueDiff(1.4);
     sensor[0].setValueMaxCnt(30*60); //30*60s=>30min
     sensor[0].setTopic(
@@ -87,7 +91,7 @@ void configure()
 
     //And a second, that is a DS18B20
     sensor[1].init(A1, SENSOR_DS18B20);
-    sensor[1].setAlarmLevels(1.0, true, 24.0, true, 18.0);
+    sensor[1].setAlarmLevels(1.0, true, 17.0, true, 24.0);
     sensor[1].setValueDiff(1.0);
     sensor[1].setValueMaxCnt(30*60); //30*60s=>30min
     sensor[1].setTopic(
@@ -100,6 +104,8 @@ void setup()
 {
     //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
     analogReference(INTERNAL); //1.1V
+
+    pinMode(led, OUTPUT);
 
     //Configure this project.
     configure();
@@ -125,15 +131,15 @@ void loop()
     {
         client.connect(project_name);
     }
+    if(false == client.connected())
+    {
+        client.connect(project_name);
+    }
 
     char str[OUT_STR_MAX];
 
     for( int i=0 ; i<SENSOR_CNT; i++ )
     {
-        if(false == client.connected())
-        {
-            client.connect(project_name);
-        }
 
         if( sensor[i].getTemperature(str, OUT_STR_MAX) )
         {
@@ -162,8 +168,11 @@ void loop()
             maxCnt--;
         }
         while( num != SENSOR_ALARM_NO && maxCnt != 0);
-
-
     }
-    delay(1000);
+
+
+    digitalWrite(led, HIGH);
+    delay(500);
+    digitalWrite(led, LOW);
+    delay(500);
 }
