@@ -13,6 +13,10 @@ git submodule update
 git submodule update --init --recursive
 git submodule update --recursive
 
+# Submodule status commands
+git submodule foreach 'git log --oneline --max-count=1'
+
+
 #Links
 http://joncairns.com/2011/10/how-to-use-git-submodules/
 http://stackoverflow.com/questions/10168449/git-update-submodule-recursive
