@@ -131,10 +131,6 @@ void loop()
     {
         client.connect(project_name);
     }
-    if(false == client.connected())
-    {
-        client.connect(project_name);
-    }
 
     char str[OUT_STR_MAX];
 
