@@ -39,8 +39,7 @@ char project_name[] = "FunTechHouse_RoomTemperature";
 #define SENSOR_CNT 2
 Sensor sensor[SENSOR_CNT];
 
-EthernetClient ethClient;
-PubSubClient client("mosqhub", 1883, callback, ethClient);
+PubSubClient client("mosqhub", 1883, callback);
 
 #define OUT_STR_MAX 100
 
