@@ -151,11 +151,12 @@ void loop()
             num = sensor[i].alarmCheckString(str, OUT_STR_MAX);
             if(num != SENSOR_ALARM_NO)
             {
-                if(
-                        (true == client.connected()) &&
-                        (true == client.publish(sensor[i].getTopicPublish(), str)) )
+                if( client.connected() )
                 {
-                    sensor[i].alarmAck(num);
+                    if( client.publish(sensor[i].getTopicPublish(), str) )
+                    {
+                        sensor[i].alarmAck(num);
+                    }
                 }
             }
 
