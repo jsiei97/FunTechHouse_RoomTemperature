@@ -27,7 +27,6 @@
 #include "Sensor.h"
 #include "TemperatureSensor.h"
 #include "SensorTypes.h"
-#include "TemperatureLogic.h"
 
 
 // Update these with values suitable for your network.

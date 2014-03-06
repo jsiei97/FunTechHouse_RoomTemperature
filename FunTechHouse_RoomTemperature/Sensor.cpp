@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "Sensor.h"
-#include "TemperatureLogic.h"
+#include "StringHelp.h"
 
 
 bool Sensor::getTemperatureString(char* str, int size)
@@ -36,8 +36,8 @@ bool Sensor::getTemperatureString(char* str, int size)
     {
         int intPart = 0;
         int decPart = 0;
-        TemperatureLogic::splitDouble(temperature, &intPart, &decPart);
-        snprintf(str, size, "temperature=%d.%d", intPart, decPart);
+        StringHelp::splitDouble(temperature, &intPart, &decPart);
+        snprintf(str, size, "temperature=%d.%02d", intPart, decPart);
         return true;
     }
     return false;
@@ -56,13 +56,13 @@ SensorAlarmNumber Sensor::alarmCheckString(char* str, int size)
             {
                 int integerPart = 0;
                 int decimalPart = 0;
-                TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
+                StringHelp::splitDouble(valueWork, &integerPart, &decimalPart);
 
                 int intAlarm = 0;
                 int decAlarm = 0;
-                TemperatureLogic::splitDouble(alarmHighLevel, &intAlarm, &decAlarm);
+                StringHelp::splitDouble(alarmHighLevel, &intAlarm, &decAlarm);
 
-                snprintf(str, size, "Alarm: High temperature=%d.%d level=%d.%d",
+                snprintf(str, size, "Alarm: High temperature=%d.%02d level=%d.%02d",
                         integerPart, decimalPart, intAlarm, decAlarm);
             }
             break;
@@ -70,13 +70,13 @@ SensorAlarmNumber Sensor::alarmCheckString(char* str, int size)
             {
                 int integerPart = 0;
                 int decimalPart = 0;
-                TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
+                StringHelp::splitDouble(valueWork, &integerPart, &decimalPart);
 
                 int intAlarm = 0;
                 int decAlarm = 0;
-                TemperatureLogic::splitDouble(alarmLowLevel, &intAlarm, &decAlarm);
+                StringHelp::splitDouble(alarmLowLevel, &intAlarm, &decAlarm);
 
-                snprintf(str, size, "Alarm: Low temperature=%d.%d level=%d.%d",
+                snprintf(str, size, "Alarm: Low temperature=%d.%02d level=%d.%02d",
                         integerPart, decimalPart, intAlarm, decAlarm);
             }
             break;

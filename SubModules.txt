@@ -4,6 +4,9 @@ git submodule add git@github.com:jsiei97/FT_Sensor.git mod/FT_Sensor
 # For MQTT
 git submodule add git@github.com:jsiei97/pubsubclient.git mod/pubsubclient
 
+# For double to string, and MQTT_Logic
+git submodule add git@github.com:jsiei97/FT_Utils.git mod/FT_Utils
+
 # Misc submodule commands
 git submodule status
 git submodule init
