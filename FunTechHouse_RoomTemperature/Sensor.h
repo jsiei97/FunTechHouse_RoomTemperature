@@ -28,6 +28,7 @@
 #include "TemperatureSensor.h"
 
 
+/// A temperature sensor class with alarm logic
 class Sensor : public MQTT_Logic, public TemperatureSensor
 {
     private:

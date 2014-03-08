@@ -29,52 +29,41 @@
 #include "SensorTypes.h"
 
 
-// Update these with values suitable for your network.
+/// This device MAC adress, it is written on the Shield and must be uniq.
 uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xB3 };
 
-// The MQTT device name, this must be unique
+/// The MQTT device name, this must be unique
 char project_name[] = "FunTechHouse_RoomTemperature";
 
+/// How many sensors shall the sensor array contain.
 #define SENSOR_CNT 2
+/// The sensor array with active sensors
 Sensor sensor[SENSOR_CNT];
 
+/// The MQTT client
 PubSubClient client("mosqhub", 1883, callback);
 
+/// Max size for the out string used in the main loop
 #define OUT_STR_MAX 100
 
+/// Life blink led is connected to IO pin.
 int led = 2;
 
 
+/**
+ * The MQTT subscribe callback function.
+ *
+ * @param[in] topic What mqtt topic triggered this callback
+ * @param[in] payload The actual message
+ * @param[in] length The message size
+ */
 void callback(char* topic, uint8_t* payload, unsigned int length)
 {
-    //1. What topic is it? aka to what sensor will the result go?
-    //2. Parse the payload and update the correct sensor
-
-    /*
-    // handle message arrived
-    char str[256];
-    //snprintf(str, 256, "echo len=%d __%s__:__%s__", length, topic, payload);
-    //client.publish(sensors[i].getTopicPublish(), str);
-
-    unsigned int i=0;
-    for(i=0; i<length; i++)
-    {
-        str[i] = payload[i];
-        str[i+1] = '\0';
-    }
-
-    for( int i=0 ; i<SENSOR_CNT; i++ )
-    {
-        if(true == sensor[i].checkTopicSubscribe(topic))
-        {
-            //Echo test on the same sensor
-            client.publish(sensor[i].getTopicPublish(), str);
-        }
-    }
-    */
 }
 
-
+/**
+ * Configure this project with device uniq sensor setup.
+ */
 void configure()
 {
     //Config the first sensor
@@ -98,6 +87,9 @@ void configure()
             );
 }
 
+/**
+ * First setup, runs once
+ */
 void setup()
 {
     //INTERNAL: an built-in reference, equal to 1.1 volts on the ATmega168 or ATmega328
@@ -122,6 +114,9 @@ void setup()
     }
 }
 
+/**
+ * The main loop, runs all the time, over and over again.
+ */
 void loop()
 {
     //Talk with the server so he dont forget us.

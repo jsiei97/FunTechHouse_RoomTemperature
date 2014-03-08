@@ -29,6 +29,13 @@
 #include "StringHelp.h"
 
 
+/**
+ * Get temperature in a mqtt formatted string 
+ *
+ * @param[out] str returns a string with temperature data
+ * @param[in] size The string max size 
+ * @return true if ok and it is time to send the data
+ */
 bool Sensor::getTemperatureString(char* str, int size)
 {
     double temperature;
@@ -44,6 +51,15 @@ bool Sensor::getTemperatureString(char* str, int size)
 }
 
 
+/**
+ * Get the alarm in a mqtt formatted string
+ *
+ * It is ok to call this function until it returns SENSOR_ALARM_NO.
+ *
+ * @param[out] str returns a string with alarm data
+ * @param[in] size The string max size 
+ * @return SensorAlarmNumber what alarm is active.
+ */
 SensorAlarmNumber Sensor::alarmCheckString(char* str, int size)
 {
     SensorAlarmNumber num = alarmCheck();
