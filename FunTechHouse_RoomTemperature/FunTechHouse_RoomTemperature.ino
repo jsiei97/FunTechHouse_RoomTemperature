@@ -2,6 +2,15 @@
  * @file FunTechHouse_RoomTemperature.ino
  * @author Johan Simonsson
  * @brief Main file
+ *
+ * @mainpage The FunTechHouse RoomTemperature
+ *
+ * Room temperature sensor for the FunTechHouse project.
+ * This project uses a Arduino with a Ethernet shield, 
+ * and sends its results using MQTT to a Mosquitto server. 
+ *
+ * @see http://fun-tech.se/FunTechHouse/RoomTemperature/
+ * @see https://github.com/jsiei97/FunTechHouse_RoomTemperature
  */
 
 /*
