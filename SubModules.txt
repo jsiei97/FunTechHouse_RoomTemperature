@@ -16,9 +16,9 @@ git submodule update
 git submodule update --init --recursive
 git submodule update --recursive
 
-# Submodule status commands
+# Submodule status and sync commands
 git submodule foreach 'git log --oneline --max-count=1'
-
+git submodule foreach 'git remote update && git checkout master && git pull'
 
 #Links
 http://joncairns.com/2011/10/how-to-use-git-submodules/
