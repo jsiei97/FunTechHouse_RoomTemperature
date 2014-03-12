@@ -77,7 +77,7 @@ void configure()
 {
     //Config the first sensor
     sensor[0].init(A0, SENSOR_LVTS_LM35);
-    sensor[0].setAlarmLevels(1.0, true, 17.0, true, 21.0);
+    sensor[0].setAlarmLevels(1.0, true, 16.0, true, 24.0);
     sensor[0].setValueDiff(1.4);
     sensor[0].setValueMaxCnt(30*60); //30*60s=>30min
     sensor[0].setTopic(
@@ -87,7 +87,7 @@ void configure()
 
     //And a second, that is a DS18B20
     sensor[1].init(A1, SENSOR_DS18B20);
-    sensor[1].setAlarmLevels(1.0, true, 17.0, true, 21.0);
+    sensor[1].setAlarmLevels(1.0, true, 16.0, true, 24.0);
     sensor[1].setValueDiff(1.0);
     sensor[1].setValueMaxCnt(30*60); //30*60s=>30min
     sensor[1].setTopic(
