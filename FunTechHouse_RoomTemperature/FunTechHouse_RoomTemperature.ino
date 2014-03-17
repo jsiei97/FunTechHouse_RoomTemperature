@@ -184,7 +184,7 @@ void loop()
                 int intPartHum = 0;
                 int decPartHum = 0;
                 TemperatureLogic::splitDouble(humidity, &intPartHum, &decPartHum);
-                snprintf(str, 80, "Temperature=%d.%d : Humidity=%d.%d", 
+                snprintf(str, 80, "temperature=%d.%d ; rh=%d.%d", 
                         intPart, decPart, intPartHum, decPartHum);
 
                 if(client.connected())
