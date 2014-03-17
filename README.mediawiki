@@ -16,3 +16,11 @@ Supported humidity sensors
 Fore more info: 
 * http://fun-tech.se/FunTechHouse/RoomTemperature/index.php
 
+
+=== git stuff ===
+<pre>
+git clone -b KCC_735EA__AM2302 git@github.com:jsiei97/FunTechHouse_RoomTemperature.git KCC_735EA__AM2302
+git push origin KCC_735EA__AM2302
+</pre>
+
+
