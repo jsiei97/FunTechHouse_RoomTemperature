@@ -27,7 +27,7 @@
 
 #include "Sensor.h"
 #include "TemperatureSensor.h"
-#include "TemperatureLogic.h"
+#include "StringHelp.h"
 
 /**
  * Default constructur,
@@ -150,13 +150,13 @@ bool TemperatureSensor::alarmHighCheck(char* responce, int maxSize)
 
             int integerPart = 0;
             int decimalPart = 0;
-            TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
+            StringHelp::splitDouble(valueWork, &integerPart, &decimalPart);
 
             int intAlarm = 0;
             int decAlarm = 0;
-            TemperatureLogic::splitDouble(alarmHigh, &intAlarm, &decAlarm);
+            StringHelp::splitDouble(alarmHigh, &intAlarm, &decAlarm);
 
-            snprintf(responce, maxSize, "Alarm: High temperature=%d.%d level=%d.%d",
+            snprintf(responce, maxSize, "Alarm: High temperature=%d.%02d level=%d.%02d",
                     integerPart, decimalPart, intAlarm, decAlarm);
             sendAlarm = true;
         }
@@ -179,13 +179,13 @@ bool TemperatureSensor::alarmLowCheck(char* responce, int maxSize)
 
             int integerPart = 0;
             int decimalPart = 0;
-            TemperatureLogic::splitDouble(valueWork, &integerPart, &decimalPart);
+            StringHelp::splitDouble(valueWork, &integerPart, &decimalPart);
 
             int intAlarm = 0;
             int decAlarm = 0;
-            TemperatureLogic::splitDouble(alarmLow, &intAlarm, &decAlarm);
+            StringHelp::splitDouble(alarmLow, &intAlarm, &decAlarm);
 
-            snprintf(responce, maxSize, "Alarm: Low temperature=%d.%d level=%d.%d",
+            snprintf(responce, maxSize, "Alarm: Low temperature=%d.%02d level=%d.%02d",
                     integerPart, decimalPart, intAlarm, decAlarm);
             sendAlarm = true;
         }

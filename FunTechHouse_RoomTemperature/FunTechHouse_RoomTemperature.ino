@@ -30,7 +30,7 @@
 #include "ValueAvg.h"
 #include "HumiditySensor.h"
 #include "TemperatureSensor.h"
-#include "TemperatureLogic.h"
+#include "StringHelp.h"
 
 // Update these with values suitable for your network.
 uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xDB };
@@ -179,12 +179,12 @@ void loop()
             {
                 int intPart = 0;
                 int decPart = 0;
-                TemperatureLogic::splitDouble(temperature, &intPart, &decPart);
+                StringHelp::splitDouble(temperature, &intPart, &decPart);
 
                 int intPartHum = 0;
                 int decPartHum = 0;
-                TemperatureLogic::splitDouble(humidity, &intPartHum, &decPartHum);
-                snprintf(str, 80, "temperature=%d.%d ; rh=%d.%d", 
+                StringHelp::splitDouble(humidity, &intPartHum, &decPartHum);
+                snprintf(str, 80, "temperature=%d.%02d ; rh=%d.%02d", 
                         intPart, decPart, intPartHum, decPartHum);
 
                 if(client.connected())

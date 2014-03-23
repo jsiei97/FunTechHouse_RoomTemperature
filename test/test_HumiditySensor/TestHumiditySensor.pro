@@ -11,5 +11,5 @@ SOURCES += TestHumiditySensor.cpp
 # Code to test
 DEPENDPATH  += ../../FunTechHouse_RoomTemperature/
 INCLUDEPATH += ../../FunTechHouse_RoomTemperature/
-SOURCES += Sensor.cpp HumiditySensor.cpp TemperatureLogic.cpp
+SOURCES += Sensor.cpp HumiditySensor.cpp StringHelp.cpp
 

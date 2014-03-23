@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include "Sensor.h"
-#include "TemperatureLogic.h"
 
 /**
  * Default constructur,
