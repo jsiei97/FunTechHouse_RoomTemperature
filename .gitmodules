@@ -1,0 +1,3 @@
+[submodule "mod/FT_Utils"]
+	path = mod/FT_Utils
+	url = git@github.com:jsiei97/FT_Utils.git
