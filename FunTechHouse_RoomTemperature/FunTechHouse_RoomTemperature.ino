@@ -34,6 +34,8 @@
 
 // Update these with values suitable for your network.
 uint8_t mac[]    = { 0x90, 0xA2, 0xDA, 0x0D, 0x51, 0xDB };
+uint8_t server[] = { 192, 168, 1, 10 };
+
 
 // The MQTT device name, this must be unique
 char project_name[] = "FunTechHouse_KCC_735EA";
@@ -41,7 +43,7 @@ char project_name[] = "FunTechHouse_KCC_735EA";
 #define SENSOR_CNT 1
 HumiditySensor sensors[SENSOR_CNT];
 
-PubSubClient client("mosqhub", 1883, callback);
+PubSubClient client(server, 1883, callback);
 
 /// @todo Make it play nicer with the others...
 DHT dht(2, DHT22);
@@ -184,8 +186,8 @@ void loop()
                 int intPartHum = 0;
                 int decPartHum = 0;
                 StringHelp::splitDouble(humidity, &intPartHum, &decPartHum);
-                snprintf(str, 80, "temperature=%d.%02d ; rh=%d.%02d", 
-                        intPart, decPart, intPartHum, decPartHum);
+                snprintf(str, 80, "temperature=%d.%02d ; rh=%d.%02d%c", 
+                        intPart, decPart, intPartHum, decPartHum, '%');
 
                 if(client.connected())
                 {
