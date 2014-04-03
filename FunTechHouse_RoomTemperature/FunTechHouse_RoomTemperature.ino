@@ -80,13 +80,13 @@ void configure()
 {
     //Config the first sensor
     sensors[0].setAlarmLevels(
-            25.0, true, 15.0, true, 
-            70.0, true, 40.0, true);
+            25.0, false, 15.0, false, 
+            70.0, true,  40.0, false);
     sensors[0].setSensor(Sensor::DHT_22, 2);
     sensors[0].setDiffToSend(0.5, 2.0);
     sensors[0].setTopic(
-            "FunTechHouse/Room1/HumidityData",
-            "FunTechHouse/Room1/Humidity"
+            "Granev5/0v/avfuktData",
+            "Granev5/0v/avfukt"
             );
 
 }
