@@ -49,9 +49,6 @@ char project_name[] = "FunTechHouse_RoomTemperature";
 /// The sensor array with active sensors
 Sensor sensor[SENSOR_CNT];
 
-/// The MQTT client
-PubSubClient client("mosqhub", 1883, callback);
-
 /// Max size for the out string used in the main loop
 #define OUT_STR_MAX 100
 
@@ -69,6 +66,9 @@ int led = 2;
 void callback(char* topic, uint8_t* payload, unsigned int length)
 {
 }
+
+/// The MQTT client
+PubSubClient client("mosqhub", 1883, callback);
 
 /**
  * Configure this project with device uniq sensor setup.
